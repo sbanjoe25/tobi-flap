@@ -224,14 +224,14 @@ export default function Home() {
       <section className="arcade-layout" aria-label="Photo Flap arcade game">
         <div className="arcade-cabinet">
           <header className="cabinet-header">
-            <div className="brand-lockup" aria-label="Photo Flap">
+            <div className="brand-lockup" aria-label="Tobi Flap">
               <div className="brand-lockup__emblem" aria-hidden="true">
                 <img className="brand-lockup__mark" src={logoImage} alt="" />
                 <span className="emblem-dots"><i /><i /><i /></span>
               </div>
               <div>
                 <p className="eyebrow">ORCHARD ARCADE</p>
-                <h1 className="wordmark" aria-label="Photo Flap"><span>PH</span><span className="wordmark__alien"><i /><i /><i /></span><span>TO</span><b>FLAP</b></h1>
+                <h1 className="wordmark" aria-label="Tobi Flap"><span>T</span><span className="wordmark__alien"><i /><i /><i /></span><span>BI</span><b>FLAP</b></h1>
               </div>
             </div>
             <div className="cabinet-header__best" aria-label={`Best score ${bestScore}`}>
@@ -244,7 +244,7 @@ export default function Home() {
             className={`game-stage game-stage--${status}`}
             onPointerDown={flap}
             role="application"
-            aria-label="Photo Flap game. Press Space, Arrow Up, or tap to flap."
+            aria-label="Tobi Flap game. Press Space, Arrow Up, or tap to flap."
           >
             <div className="game-stage__sky" style={{ backgroundImage: `url(${skyImage})` }} />
             <div className="game-stage__grain" />

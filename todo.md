@@ -2,4 +2,5 @@
 - [x] Widen the obstacle gap and soften the flight pacing for a more forgiving game.
 - [x] Replace the circular player frame and pilot badge portrait with the new cut-out asset.
 - [x] Verify the revised character sprite presents without an opaque rectangular or circular frame.
+- [x] Rename all visible game and browser-brand references to Tobi Flap.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.
