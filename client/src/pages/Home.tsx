@@ -2,7 +2,7 @@
  * Orchard Arcade visual system: tactile storybook flight cabinet with a photo-first player character.
  */
 import { Button } from "@/components/ui/button";
-import { ArrowUp, RotateCcw, Trophy } from "lucide-react";
+import { ArrowUp, LayoutGrid, RotateCcw, Trophy } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type GameStatus = "ready" | "playing" | "gameover";
@@ -165,6 +165,10 @@ export default function Home() {
     window.localStorage.setItem("tobi-flap-character", characterId);
   }, []);
 
+  const returnToMenu = useCallback(() => {
+    resetFlight(false);
+  }, [resetFlight]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === "Space" || event.code === "ArrowUp") {
@@ -288,12 +292,24 @@ export default function Home() {
               <strong>{score}</strong>
             </div>
 
+            {status === "playing" && (
+              <button
+                type="button"
+                className="return-to-menu"
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={returnToMenu}
+              >
+                <LayoutGrid size={14} />
+                Menu
+              </button>
+            )}
+
             {pipes.map((pipe) => (
               <PipeColumn key={pipe.id} pipe={pipe} />
             ))}
 
             <div
-              className={`photo-flier photo-flier--${selectedCharacter.id}`}
+              className={`photo-flier photo-flier--${selectedCharacter.id} spaceship-pilot`}
               style={{ left: `${(CHARACTER_X / STAGE_WIDTH) * 100}%`, top: `${characterTop}%`, transform: `translate(-50%, -50%) rotate(${characterAngle}deg)` }}
               aria-hidden="true"
             >
@@ -309,7 +325,7 @@ export default function Home() {
               <div className="game-overlay game-overlay--start">
               <div className="game-overlay__card">
                   <div className="pilot-badge">
-                    <div className={`pilot-badge__portrait pilot-badge__portrait--${selectedCharacter.id}`}><img src={selectedCharacter.image} alt="" /></div>
+                    <div className={`pilot-badge__portrait pilot-badge__portrait--${selectedCharacter.id} spaceship-pilot__mini`}><img src={selectedCharacter.image} alt="" /></div>
                     <div><span>YOUR PILOT</span><strong>{selectedCharacter.name} is ready</strong></div>
                   </div>
                   <p className="overlay-kicker">READY FOR TAKEOFF?</p>
@@ -329,7 +345,7 @@ export default function Home() {
                             onClick={() => chooseCharacter(character.id)}
                             aria-pressed={isSelected}
                           >
-                            <span className="character-choice__portrait"><img src={character.image} alt="" /></span>
+                            <span className="character-choice__portrait spaceship-pilot__mini"><img src={character.image} alt="" /></span>
                             <span><strong>{character.name}</strong><small>{character.note}</small></span>
                           </button>
                         );
@@ -357,10 +373,16 @@ export default function Home() {
                     <span>{selectedCharacter.name.toUpperCase()}’S BEST</span>
                     <strong>{bestScore}</strong>
                   </div>
-                  <Button className="launch-button" onPointerDown={(event) => event.stopPropagation()} onClick={flap}>
-                    <RotateCcw size={17} />
-                    Fly again
-                  </Button>
+                  <div className="landing-actions">
+                    <Button className="launch-button" onPointerDown={(event) => event.stopPropagation()} onClick={flap}>
+                      <RotateCcw size={17} />
+                      Fly again
+                    </Button>
+                    <Button className="menu-button" variant="outline" onPointerDown={(event) => event.stopPropagation()} onClick={returnToMenu}>
+                      <LayoutGrid size={16} />
+                      Change pilot
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}

@@ -9,4 +9,8 @@
 - [x] Validate the selector and selected-character presentation.
 - [x] Produce and apply a Liam face cut-out matching Tobi’s treatment.
 - [x] Verify Liam’s face-shaped sprite is prominent in the picker and flight view.
+- [x] Add a return-to-menu control that restores character selection.
+- [x] Create recognizable spaceship-pilot treatments for Tobi and Liam.
+- [x] Apply the pilot visual system to character cards, active flight, and landing state.
+- [x] Validate menu return and spaceship pilot presentation.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.
