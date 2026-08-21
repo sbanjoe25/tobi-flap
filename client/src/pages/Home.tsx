@@ -280,6 +280,8 @@ export default function Home() {
             role="application"
             aria-label={`Tobi Flap game. ${selectedCharacter.name} is selected. Press Space, Arrow Up, or tap to flap.`}
           >
+            <div className="starfield starfield--far" aria-hidden="true" />
+            <div className="starfield starfield--near" aria-hidden="true" />
             <div className="game-stage__sky" style={{ backgroundImage: `url(${skyImage})` }} />
             <div className="game-stage__grain" />
             <div className="cloud cloud--one" />

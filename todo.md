@@ -37,4 +37,7 @@
 - [x] Verify the Tobi spacecraft edge is clean against the sky background.
 - [x] Add a subtle multi-layer cockpit shadow for visual depth.
 - [x] Verify the shadow remains soft and unobtrusive in the game view.
+- [x] Add layered starfield planes behind the orchard sky.
+- [x] Add gentle parallax motion with reduced-motion support.
+- [x] Verify the starfield remains subtle and does not obscure gameplay.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.

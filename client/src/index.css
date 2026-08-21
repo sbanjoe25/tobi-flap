@@ -125,9 +125,12 @@
 }
 
 .game-stage__sky { position: absolute; z-index: -4; inset: 0; background-position: center; background-size: cover; opacity: .92; }
-.game-stage__grain { position: absolute; z-index: -3; inset: 0; pointer-events: none; opacity: .28; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E"); mix-blend-mode: multiply; }
+.starfield { position: absolute; z-index: -3; inset: -20%; pointer-events: none; background-repeat: repeat; mix-blend-mode: screen; }
+.starfield--far { opacity: .34; background-image: radial-gradient(circle at 11px 19px, rgba(255, 255, 246, .95) 0 1px, transparent 1.6px), radial-gradient(circle at 39px 54px, rgba(255, 236, 175, .82) 0 1px, transparent 1.8px), radial-gradient(circle at 69px 30px, rgba(255, 255, 255, .7) 0 .8px, transparent 1.5px); background-size: 86px 78px; animation: star-drift-far 34s linear infinite; }
+.starfield--near { opacity: .23; background-image: radial-gradient(circle at 24px 34px, rgba(255, 248, 205, 1) 0 1.8px, transparent 2.6px), radial-gradient(circle at 78px 81px, rgba(255, 255, 255, .9) 0 1.2px, transparent 2px), radial-gradient(circle at 108px 45px, rgba(247, 190, 235, .9) 0 1px, transparent 1.8px); background-size: 138px 118px; animation: star-drift-near 19s linear infinite; }
+.game-stage__grain { position: absolute; z-index: -2; inset: 0; pointer-events: none; opacity: .28; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E"); mix-blend-mode: multiply; }
 
-.cloud { position: absolute; z-index: -2; width: 84px; height: 23px; border: 2px solid rgba(22, 55, 74, .22); border-radius: 99px; background: rgba(255, 250, 240, .82); box-shadow: 24px -10px 0 -3px rgba(255, 250, 240, .82), 45px -5px 0 -4px rgba(255, 250, 240, .82); }
+.cloud { position: absolute; z-index: -1; width: 84px; height: 23px; border: 2px solid rgba(22, 55, 74, .22); border-radius: 99px; background: rgba(255, 250, 240, .82); box-shadow: 24px -10px 0 -3px rgba(255, 250, 240, .82), 45px -5px 0 -4px rgba(255, 250, 240, .82); }
 .cloud--one { top: 17%; left: 66%; animation: drift 20s linear infinite; }
 .cloud--two { top: 38%; left: -12%; transform: scale(.62); animation: drift 26s -12s linear infinite; }
 .cloud--three { top: 61%; left: 67%; transform: scale(.46); animation: drift 18s -6s linear infinite; }
@@ -229,6 +232,8 @@ kbd { display: inline-block; padding: 1px 4px; border: 1px solid #16374a; border
 .flight-notes__tip span { margin-right: 6px; color: #718d26; font-size: 9px; font-weight: 900; letter-spacing: .13em; }
 
 @keyframes drift { from { translate: 0 0; } to { translate: 100px 0; } }
+@keyframes star-drift-far { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-36px, 18px, 0); } }
+@keyframes star-drift-near { from { transform: translate3d(0, 0, 0); } to { transform: translate3d(-74px, 32px, 0); } }
 @keyframes overlay-enter { from { opacity: 0; transform: translateY(10px) scale(.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
 @media (prefers-reduced-motion: reduce) {
