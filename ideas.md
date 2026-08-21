@@ -45,6 +45,9 @@
 
 ## Style Decisions
 
+### Space Arcade revision
+The surrounding experience now uses a dark cosmic palette: deep midnight navy fields, cyan instrumentation, violet-pink energy accents, and lime pilot indicators. The cockpit game remains playful and readable, while the cabinet, corridors, copy, and companion panel present a cohesive Space Arcade environment.
+
 - The supplied photo is shown in the pre-flight pilot badge and remains the main character signal from the first screen.
 - The wordmark uses a lime, three-eyed alien form as the “O,” with a hand-bounced `FLAP` counterweight to avoid a generic UI title.
 - The three-eye alien dot pattern is a recurring stamp in the score, cabinet footer, and flight notes; Orchard Pea remains reserved for this motif, the pilot accents, scores, and primary actions.

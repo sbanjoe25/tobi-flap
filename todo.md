@@ -52,4 +52,8 @@
 - [x] Make the hover effect visibly stronger during active flight.
 - [x] Add a clear visual engine-effect indicator while a cockpit is moving.
 - [x] Verify audio and motion feedback after an actual flight start.
+- [x] Replace the Orchard Arcade surroundings with a dark cosmic Space Arcade environment.
+- [x] Update supporting copy and labels from orchard flight to space flight.
+- [x] Preserve the cockpit game’s visibility and interactions against the new dark theme.
+- [x] Validate the dark cosmic theme on desktop and mobile.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.

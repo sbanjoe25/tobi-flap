@@ -33,8 +33,6 @@ const FLAP_VELOCITY = -325;
 const PIPE_SPEED = 126;
 const PIPE_INTERVAL = 1.7;
 
-const skyImage = "/manus-storage/photo-flap-orchard-sky_522434be.png";
-const horizonImage = "/manus-storage/photo-flap-orchard-horizon_6cafdd03.png";
 const logoImage = "/manus-storage/photo-flap-alien-logo_ea409bed.png";
 
 const CHARACTERS: Array<{ id: CharacterId; name: string; image: string; note: string }> = [
@@ -363,7 +361,7 @@ export default function Home() {
                 <span className="emblem-dots"><i /><i /><i /></span>
               </div>
               <div>
-                <p className="eyebrow">ORCHARD ARCADE</p>
+                <p className="eyebrow">SPACE ARCADE</p>
                 <h1 className="wordmark" aria-label="Tobi Flap"><span>T</span><span className="wordmark__alien"><i /><i /><i /></span><span>BI</span><b>FLAP</b></h1>
               </div>
             </div>
@@ -381,7 +379,7 @@ export default function Home() {
           >
             <div className="starfield starfield--far" aria-hidden="true" />
             <div className="starfield starfield--near" aria-hidden="true" />
-            <div className="game-stage__sky" style={{ backgroundImage: `url(${skyImage})` }} />
+            <div className="game-stage__sky" />
             <div className="game-stage__grain" />
             <div className="cloud cloud--one" />
             <div className="cloud cloud--two" />
@@ -445,7 +443,7 @@ export default function Home() {
                     <div><span>YOUR PILOT</span><strong>{selectedCharacter.name} is ready</strong></div>
                   </div>
                   <p className="overlay-kicker">READY FOR TAKEOFF?</p>
-                  <h2>Thread the orchard.</h2>
+                  <h2>Thread the starfield.</h2>
                   <p>Tap the sky or press <kbd>SPACE</kbd> to launch.</p>
                   <div className="character-picker" aria-label="Choose a character">
                     <p>CHOOSE A PILOT</p>
@@ -479,7 +477,7 @@ export default function Home() {
             {status === "gameover" && (
               <div className="game-overlay game-overlay--over">
                 <div className="game-overlay__card game-overlay__card--over">
-                  <p className="overlay-kicker">ORCHARD LANDING</p>
+                  <p className="overlay-kicker">COSMIC LANDING</p>
                   <h2>{selectedCharacter.name}'s flight!</h2>
                   <div className="result-row">
                     <span>THIS FLIGHT</span>
@@ -506,17 +504,17 @@ export default function Home() {
 
           <footer className="cabinet-footer">
             <span className="cabinet-footer__dot" />
-            <p>Tap, click, or press <kbd>SPACE</kbd> to flap.</p>
+            <p>Tap, click, or press <kbd>SPACE</kbd> to boost.</p>
             <span className="cabinet-footer__dots" aria-hidden="true"><i /><i /><i /></span>
           </footer>
         </div>
 
         <aside className="flight-notes" aria-label="How to play">
-          <div className="flight-notes__visual" style={{ backgroundImage: `url(${horizonImage})` }} />
+          <div className="flight-notes__visual" />
           <div className="flight-notes__content">
-            <div className="flight-notes__label"><span className="flight-notes__badge">ONE-TAP ARCADE</span><span className="flight-notes__brand-stamp" aria-hidden="true"><i /><i /><i /></span></div>
-            <h2>One tap.<br />One tiny launch.</h2>
-            <p>Guide your photo-powered flier through the orchard vines. Every clean pass grows your flight score.</p>
+            <div className="flight-notes__label"><span className="flight-notes__badge">SPACE ARCADE</span><span className="flight-notes__brand-stamp" aria-hidden="true"><i /><i /><i /></span></div>
+            <h2>One tap.<br />One stellar launch.</h2>
+            <p>Guide your photo-powered cockpit through cosmic gates. Every clear pass powers up your flight score.</p>
 
             <div className="how-to-play">
               <div className="how-to-play__step">
@@ -529,7 +527,7 @@ export default function Home() {
               </div>
               <div className="how-to-play__step">
                 <span className="step-number">03</span>
-                <div><strong>Collect</strong><small>Pass vines to set a best flight.</small></div>
+                <div><strong>Navigate</strong><small>Pass cosmic gates to set a best flight.</small></div>
               </div>
             </div>
 

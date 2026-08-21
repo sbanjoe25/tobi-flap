@@ -1,6 +1,6 @@
 /**
- * Orchard Arcade visual system: sunlit paper-collage terrain, pea-green vines, tactile inked surfaces.
- * Does this choice reinforce or dilute the storybook arcade philosophy?
+ * Space Arcade visual system: deep-space surround, luminous gate corridors, and tactile cosmic instrumentation.
+ * Does this choice reinforce or dilute the playful cockpit-flight philosophy?
  */
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -238,6 +238,76 @@ kbd { display: inline-block; padding: 1px 4px; border: 1px solid #16374a; border
 .how-to-play__step small { color: #638096; font-size: 11px; font-weight: 700; }
 .flight-notes__tip { padding: 9px 11px; border-radius: 11px; background: #fff0d3; color: #386074; font-size: 11px; font-weight: 800; line-height: 1.35; }
 .flight-notes__tip span { margin-right: 6px; color: #718d26; font-size: 9px; font-weight: 900; letter-spacing: .13em; }
+
+/* Space Arcade theme override: dark cosmic surroundings with bright playable instrumentation. */
+html { background: #050717; }
+body { background: #050717; color: #eaf7ff; }
+.orchard-app { background: radial-gradient(circle at 12% 20%, rgba(152, 87, 246, .28) 0 2%, transparent 23%), radial-gradient(circle at 85% 77%, rgba(36, 215, 230, .15) 0 3%, transparent 27%), radial-gradient(circle at 62% 8%, rgba(249, 118, 202, .12) 0 1%, transparent 20%), radial-gradient(circle at 11px 19px, rgba(255, 255, 255, .75) 0 1px, transparent 1.6px), radial-gradient(circle at 52px 77px, rgba(151, 225, 255, .7) 0 1px, transparent 1.7px), linear-gradient(135deg, #050717 0%, #111332 46%, #090a22 100%); background-size: auto, auto, auto, 95px 87px, 143px 119px, auto; }
+.orchard-app::before, .orchard-app::after { border-color: rgba(124, 220, 255, .19); box-shadow: inset 0 0 42px rgba(135, 87, 255, .1); }
+.arcade-cabinet { filter: drop-shadow(0 22px 28px rgba(0, 0, 0, .44)) drop-shadow(0 0 18px rgba(79, 214, 255, .18)); }
+.arcade-cabinet::before { border-color: #7ce2ff; background: linear-gradient(#f29bd8, #946df2); box-shadow: 3px 3px 0 rgba(0, 0, 0, .36), 0 0 12px rgba(116, 221, 255, .38); }
+.cabinet-header { border-color: #7ce2ff; background: linear-gradient(110deg, #161b42, #10142f); }
+.eyebrow { color: #7ce2ff; }
+.wordmark { color: #f4f7ff; }
+.wordmark b { color: #9fe971; }
+.wordmark__alien { border-color: #7ce2ff; box-shadow: 1px 2px 0 #090a22, 0 0 12px rgba(159, 233, 113, .52); }
+.brand-lockup__mark { filter: drop-shadow(2px 2px 0 #090a22) drop-shadow(0 0 7px rgba(124, 226, 255, .56)); }
+.emblem-dots { border-color: #7ce2ff; background: #111735; }
+.emblem-dots i { background: #f4f7ff; }
+.cabinet-header__best { border-color: #7ce2ff; background: #222858; color: #f4f7ff; box-shadow: 3px 3px 0 #050717, 0 0 12px rgba(124, 226, 255, .25); }
+.game-stage { border-color: #7ce2ff; background: #070b23; box-shadow: inset 0 0 34px rgba(100, 80, 214, .25); }
+.game-stage__sky { background: radial-gradient(ellipse at 50% 110%, rgba(135, 61, 205, .5) 0 24%, transparent 58%), radial-gradient(circle at 75% 21%, rgba(69, 204, 246, .25) 0 2%, transparent 19%), linear-gradient(180deg, #050817 0%, #0a1442 50%, #1c1755 100%); opacity: 1; }
+.starfield { mix-blend-mode: screen; }
+.starfield--far { opacity: .62; }
+.starfield--near { opacity: .42; }
+.game-stage__grain { opacity: .16; mix-blend-mode: screen; }
+.cloud { border-color: rgba(123, 227, 255, .18); background: rgba(141, 95, 225, .17); box-shadow: 24px -10px 0 -3px rgba(141, 95, 225, .16), 45px -5px 0 -4px rgba(141, 95, 225, .16), 0 0 18px rgba(111, 209, 255, .12); }
+.score-pill, .sound-toggle, .return-to-menu { border-color: #7ce2ff; background: rgba(12, 19, 51, .88); color: #f4f7ff; box-shadow: 2px 2px 0 #050717, 0 0 11px rgba(124, 226, 255, .23); }
+.score-pill span { color: #7ce2ff; }
+.score-pill strong { color: #f4f7ff; }
+.score-pill__stamp { border-color: #7ce2ff; background: #9fe971; }
+.sound-toggle[aria-pressed="true"] { background: #362143; color: #f29bd8; }
+.pipe__stem { border-color: #7ce2ff; background: repeating-linear-gradient(90deg, #523a94 0 14px, #312560 14px 27px); box-shadow: inset -8px 0 0 rgba(245, 156, 217, .2), 0 0 16px rgba(124, 226, 255, .28); }
+.pipe__rim { border-color: #7ce2ff; background: repeating-linear-gradient(90deg, #f29bd8 0 17px, #9a72f6 17px 34px); box-shadow: inset -6px 0 0 rgba(255, 255, 255, .15), 3px 4px 0 rgba(5, 7, 23, .46), 0 0 13px rgba(242, 155, 216, .46); }
+.pipe__leaf { border-color: #7ce2ff; background: #9fe971; box-shadow: 0 0 8px rgba(159, 233, 113, .65); }
+.photo-flier--tobi, .photo-flier--liam { filter: drop-shadow(0 9px 8px rgba(0, 0, 0, .52)) drop-shadow(0 0 9px rgba(124, 226, 255, .34)); }
+.orchard-ground { border-color: #7ce2ff; background: linear-gradient(90deg, #0b1236, #221547, #0b1236); }
+.orchard-ground__stripe { border-color: #f29bd8; background: linear-gradient(90deg, #9a72f6, #7ce2ff, #9a72f6); }
+.orchard-ground__dots { background-image: radial-gradient(circle, #9fe971 1.3px, transparent 1.8px); opacity: .64; }
+.game-overlay { background: rgba(1, 3, 17, .5); backdrop-filter: blur(2px); }
+.game-overlay__card { border-color: #7ce2ff; background: linear-gradient(150deg, rgba(17, 23, 60, .97), rgba(12, 15, 41, .98)); box-shadow: 7px 8px 0 #050717, 0 0 18px rgba(124, 226, 255, .25); }
+.pilot-badge { border-color: #7ce2ff; background: #171d49; box-shadow: 2px 2px 0 #050717; }
+.pilot-badge span, .overlay-kicker, .character-picker > p { color: #7ce2ff !important; }
+.pilot-badge strong, .game-overlay h2 { color: #f4f7ff; }
+.game-overlay__card > p:not(.overlay-kicker) { color: #c5d8f5; }
+.character-picker { border-color: rgba(124, 226, 255, .35); }
+.character-choice { border-color: rgba(124, 226, 255, .45); background: #121a42; color: #f4f7ff; }
+.character-choice:hover { border-color: #7ce2ff; }
+.character-choice.is-selected { border-color: #9fe971; background: #1c2b47; box-shadow: 2px 2px 0 #050717, 0 0 10px rgba(159, 233, 113, .3); }
+.character-choice small { color: #b8caea; }
+kbd { border-color: #7ce2ff; background: #2d245c; color: #f4f7ff; }
+.launch-button { border-color: #7ce2ff !important; background: linear-gradient(90deg, #9a72f6, #f29bd8) !important; color: #070b23 !important; box-shadow: 4px 4px 0 #050717, 0 0 12px rgba(242, 155, 216, .35); }
+.menu-button { border-color: #7ce2ff !important; background: #141b44 !important; color: #f4f7ff !important; }
+.result-row { border-color: rgba(124, 226, 255, .35); }
+.result-row span { color: #b8caea; }
+.result-row strong { color: #f4f7ff; }
+.result-row--best strong { color: #9fe971; }
+.cabinet-footer { border-color: #7ce2ff; background: #070b23; color: #eaf7ff; }
+.cabinet-footer kbd { border-color: #7ce2ff; background: #2d245c; color: #f4f7ff; }
+.cabinet-footer__dot { background: #9fe971; box-shadow: 10px 0 0 #f29bd8; }
+.cabinet-footer__dots { border-color: rgba(124, 226, 255, .72); }
+.cabinet-footer__dots i { background: #7ce2ff; }
+.flight-notes { border-color: #7ce2ff; background: linear-gradient(150deg, #151a42, #0d112e); box-shadow: 13px 14px 0 rgba(0, 0, 0, .34), 0 0 18px rgba(124, 226, 255, .15); }
+.flight-notes__visual { border-color: #7ce2ff; background: radial-gradient(circle at 24% 32%, #f7c469 0 7%, #d560af 8% 10%, transparent 11%), radial-gradient(circle at 73% 62%, rgba(124, 226, 255, .72) 0 2%, transparent 16%), radial-gradient(circle at 15px 22px, rgba(255, 255, 255, .85) 0 1px, transparent 1.8px), linear-gradient(140deg, #090b22, #25165c 58%, #10335a); background-size: auto, auto, 66px 54px, auto; }
+.flight-notes__badge { border-color: #7ce2ff; background: #2d245c; color: #f4f7ff; }
+.flight-notes__brand-stamp { border-color: #7ce2ff; background: #9fe971; }
+.flight-notes h2 { color: #f4f7ff; }
+.flight-notes__content > p, .how-to-play__step small { color: #b8caea; }
+.how-to-play { border-color: rgba(124, 226, 255, .2); }
+.step-number { border-color: #7ce2ff; background: #1b2b53; color: #9fe971; }
+.how-to-play__step strong { color: #f4f7ff; }
+.flight-notes__tip { background: #211943; color: #dce7ff; }
+.flight-notes__tip span { color: #f29bd8; }
 
 @keyframes drift { from { translate: 0 0; } to { translate: 100px 0; } }
 @keyframes cockpit-hover { 0%, 100% { transform: translate3d(0, 2px, 0) rotate(-1.25deg); } 50% { transform: translate3d(0, -7px, 0) rotate(1.25deg); } }
