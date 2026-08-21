@@ -315,7 +315,9 @@ export default function Home() {
               style={{ left: `${(CHARACTER_X / STAGE_WIDTH) * 100}%`, top: `${characterTop}%`, transform: `translate(-50%, -50%) rotate(${characterAngle}deg)` }}
               aria-hidden="true"
             >
-              <img src={selectedCharacter.image} alt="" />
+              <div className={`cockpit-hover cockpit-hover--${selectedCharacter.id}`}>
+                <img src={selectedCharacter.image} alt="" />
+              </div>
             </div>
 
             <div className="orchard-ground">

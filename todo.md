@@ -42,4 +42,7 @@
 - [x] Verify the starfield remains subtle and does not obscure gameplay.
 - [x] Match Tobi’s cockpit shadow softness and depth to Liam’s treatment.
 - [x] Verify the two pilot shadows have consistent visual quality.
+- [x] Add gentle cockpit hover motion for both pilots.
+- [x] Stagger the pilot timing and respect reduced-motion preferences.
+- [x] Verify the hover motion remains subtle and does not conflict with flight movement.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.
