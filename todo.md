@@ -18,4 +18,6 @@
 - [x] Validate Liam’s card, pilot badge, and in-flight cockpit presentation.
 - [x] Generate and apply a Tobi cockpit pilot cut-out matching Liam’s layout.
 - [x] Verify the matched Tobi and Liam cockpit views across selection and flight.
+- [x] Remove Tobi’s remaining distinct portrait framing and match Liam’s integrated cockpit layout.
+- [x] Verify the corrected Tobi cockpit treatment in the visible character selector.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.
