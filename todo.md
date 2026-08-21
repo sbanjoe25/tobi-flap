@@ -72,3 +72,8 @@
 - [x] Add background music and event-driven game sound effects.
 - [x] Integrate new audio with mute state and browser-gesture playback rules.
 - [x] Validate the audio experience and save a delivery checkpoint.
+- [x] Diagnose asteroid collision misses and score-driven difficulty progression.
+- [x] Add persistent, separate music and sound-effects volume controls in settings.
+- [x] Make asteroid collision detection match the visible debris shape reliably.
+- [x] Apply progression to both existing and newly spawned asteroids with clear tier feedback.
+- [x] Validate settings, collision, and difficulty behavior and save a delivery checkpoint.

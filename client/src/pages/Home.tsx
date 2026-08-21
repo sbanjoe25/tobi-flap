@@ -2,7 +2,7 @@
  * Space Arcade visual system: dark collectible flight cabinet with a photo-first cockpit pilot.
  */
 import { Button } from "@/components/ui/button";
-import { ArrowUp, LayoutGrid, RotateCcw, Trophy, Volume2, VolumeX } from "lucide-react";
+import { ArrowUp, LayoutGrid, RotateCcw, SlidersHorizontal, Trophy, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type GameStatus = "ready" | "playing" | "gameover";
@@ -29,6 +29,7 @@ type HoverAudioNodes = {
   gain: GainNode;
   lfo: OscillatorNode;
   lfoGain: GainNode;
+  baseGain: number;
 };
 
 const STAGE_WIDTH = 360;
@@ -36,6 +37,8 @@ const STAGE_HEIGHT = 640;
 const GROUND_HEIGHT = 56;
 const CHARACTER_SIZE = 58;
 const CHARACTER_X = 98;
+const PLAYER_COLLISION_HALF_WIDTH = 37;
+const PLAYER_COLLISION_HALF_HEIGHT = 34;
 const PIPE_WIDTH = 76;
 const PIPE_GAP = 224;
 const GRAVITY = 900;
@@ -44,9 +47,10 @@ const PIPE_SPEED = 126;
 const PIPE_INTERVAL = 1.7;
 const ASTEROID_DIFFICULTY_TIERS = [
   { minimumScore: 0, level: 1, label: "SCOUT", speed: 192, interval: 0.92 },
-  { minimumScore: 4, level: 2, label: "RUSH", speed: 218, interval: 0.84 },
-  { minimumScore: 8, level: 3, label: "SURGE", speed: 244, interval: 0.76 },
-  { minimumScore: 12, level: 4, label: "NOVA", speed: 270, interval: 0.68 },
+  { minimumScore: 3, level: 2, label: "RUSH", speed: 236, interval: 0.78 },
+  { minimumScore: 6, level: 3, label: "SURGE", speed: 280, interval: 0.66 },
+  { minimumScore: 9, level: 4, label: "NOVA", speed: 324, interval: 0.55 },
+  { minimumScore: 12, level: 5, label: "ECLIPSE", speed: 360, interval: 0.48 },
 ] as const;
 
 const logoImage = "/manus-storage/photo-flap-alien-logo_ea409bed.png";
@@ -78,8 +82,8 @@ const randomPipe = (id: number, x = STAGE_WIDTH + 30): Pipe => {
   };
 };
 
-const randomAsteroid = (id: number, x = STAGE_WIDTH + 28): Asteroid => {
-  const size = 34 + Math.round(Math.random() * 29);
+const randomAsteroid = (id: number, difficultyLevel = 1, x = STAGE_WIDTH + 28): Asteroid => {
+  const size = 34 + Math.round(Math.random() * 29) + Math.min((difficultyLevel - 1) * 3, 12);
   return {
     id,
     x,
@@ -91,6 +95,19 @@ const randomAsteroid = (id: number, x = STAGE_WIDTH + 28): Asteroid => {
 
 const getAsteroidDifficulty = (currentScore: number) =>
   [...ASTEROID_DIFFICULTY_TIERS].reverse().find((tier) => currentScore >= tier.minimumScore) ?? ASTEROID_DIFFICULTY_TIERS[0];
+
+const clampVolume = (value: number) => Math.min(100, Math.max(0, value));
+
+const doesAsteroidHitPlayer = (asteroid: Asteroid, playerY: number) => {
+  const asteroidCenterX = asteroid.x + asteroid.size * .5;
+  const asteroidCenterY = asteroid.y + asteroid.size * .5;
+  const closestX = Math.max(CHARACTER_X - PLAYER_COLLISION_HALF_WIDTH, Math.min(asteroidCenterX, CHARACTER_X + PLAYER_COLLISION_HALF_WIDTH));
+  const closestY = Math.max(playerY - PLAYER_COLLISION_HALF_HEIGHT, Math.min(asteroidCenterY, playerY + PLAYER_COLLISION_HALF_HEIGHT));
+  const distanceX = asteroidCenterX - closestX;
+  const distanceY = asteroidCenterY - closestY;
+  const asteroidRadius = asteroid.size * .46;
+  return distanceX * distanceX + distanceY * distanceY <= asteroidRadius * asteroidRadius;
+};
 
 function getInitialGame(mode: GameMode = "normal") {
   return {
@@ -159,6 +176,9 @@ export default function Home() {
   const [selectedCharacterId, setSelectedCharacterId] = useState<CharacterId>("tobi");
   const [gameMode, setGameMode] = useState<GameMode>("normal");
   const [isMuted, setIsMuted] = useState(false);
+  const [musicVolume, setMusicVolume] = useState(55);
+  const [effectsVolume, setEffectsVolume] = useState(80);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [asteroids, setAsteroids] = useState<Asteroid[]>([]);
   const gameRef = useRef(getInitialGame());
   const statusRef = useRef<GameStatus>("ready");
@@ -169,6 +189,7 @@ export default function Home() {
 
   const selectedCharacter = CHARACTERS.find((character) => character.id === selectedCharacterId) ?? CHARACTERS[0];
   const asteroidDifficulty = getAsteroidDifficulty(score);
+  const effectsLevel = effectsVolume / 100;
 
   useEffect(() => {
     const storedCharacter = window.localStorage.getItem("tobi-flap-character") as CharacterId | null;
@@ -176,6 +197,10 @@ export default function Home() {
     const storedMode = window.localStorage.getItem("tobi-flap-mode") as GameMode | null;
     if (storedMode === "normal" || storedMode === "asteroid") setGameMode(storedMode);
     setIsMuted(window.localStorage.getItem("tobi-flap-muted") === "true");
+    const storedMusicVolume = window.localStorage.getItem("tobi-flap-music-volume");
+    const storedEffectsVolume = window.localStorage.getItem("tobi-flap-effects-volume");
+    if (storedMusicVolume !== null && Number.isFinite(Number(storedMusicVolume))) setMusicVolume(clampVolume(Number(storedMusicVolume)));
+    if (storedEffectsVolume !== null && Number.isFinite(Number(storedEffectsVolume))) setEffectsVolume(clampVolume(Number(storedEffectsVolume)));
   }, []);
 
   useEffect(() => {
@@ -188,7 +213,7 @@ export default function Home() {
     const soundtrack = new Audio(soundtrackUrl);
     soundtrack.loop = true;
     soundtrack.preload = "auto";
-    soundtrack.volume = 0.16;
+    soundtrack.volume = 0;
     backgroundMusicRef.current = soundtrack;
 
     return () => {
@@ -198,6 +223,11 @@ export default function Home() {
       backgroundMusicRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    const soundtrack = backgroundMusicRef.current;
+    if (soundtrack) soundtrack.volume = (musicVolume / 100) * .28;
+  }, [musicVolume]);
 
   const stopHoverAudio = useCallback(() => {
     const nodes = hoverAudioRef.current;
@@ -233,16 +263,17 @@ export default function Home() {
     lfo.frequency.setValueAtTime(isTobi ? 1.55 : 2.15, now);
     lfoGain.gain.setValueAtTime(isTobi ? 6 : 9, now);
     gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(isTobi ? 0.052 : 0.04, now + 0.12);
+    const baseGain = isTobi ? 0.052 : 0.04;
+    gain.gain.exponentialRampToValueAtTime(baseGain * effectsLevel, now + 0.12);
     lfo.connect(lfoGain);
     lfoGain.connect(oscillator.frequency);
     oscillator.connect(gain);
     gain.connect(context.destination);
     oscillator.start();
     lfo.start();
-    hoverAudioRef.current = { oscillator, gain, lfo, lfoGain };
+    hoverAudioRef.current = { oscillator, gain, lfo, lfoGain, baseGain };
     void context.resume();
-  }, [isMuted]);
+  }, [effectsLevel, isMuted]);
 
   const playFlapChirp = useCallback((pilotId: CharacterId) => {
     const context = audioContextRef.current;
@@ -256,13 +287,13 @@ export default function Home() {
     oscillator.frequency.setValueAtTime(isTobi ? 320 : 410, now);
     oscillator.frequency.exponentialRampToValueAtTime(isTobi ? 235 : 305, now + 0.12);
     gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(isTobi ? 0.055 : 0.044, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime((isTobi ? 0.055 : 0.044) * effectsLevel, now + 0.012);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
     oscillator.connect(gain);
     gain.connect(context.destination);
     oscillator.start(now);
     oscillator.stop(now + 0.15);
-  }, [isMuted]);
+  }, [effectsLevel, isMuted]);
 
   const stopBackgroundMusic = useCallback(() => {
     const soundtrack = backgroundMusicRef.current;
@@ -278,6 +309,23 @@ export default function Home() {
     if (playback) void playback.catch(() => undefined);
   }, [isMuted]);
 
+  const updateMusicVolume = useCallback((value: number) => {
+    const next = clampVolume(value);
+    setMusicVolume(next);
+    window.localStorage.setItem("tobi-flap-music-volume", String(next));
+    const soundtrack = backgroundMusicRef.current;
+    if (soundtrack) soundtrack.volume = (next / 100) * .28;
+  }, []);
+
+  const updateEffectsVolume = useCallback((value: number) => {
+    const next = clampVolume(value);
+    setEffectsVolume(next);
+    window.localStorage.setItem("tobi-flap-effects-volume", String(next));
+    const nodes = hoverAudioRef.current;
+    const context = audioContextRef.current;
+    if (nodes && context) nodes.gain.gain.setTargetAtTime(nodes.baseGain * (next / 100), context.currentTime, 0.02);
+  }, []);
+
   const playScoreChime = useCallback((currentScore: number) => {
     const context = audioContextRef.current;
     if (isMuted || !context) return;
@@ -290,13 +338,13 @@ export default function Home() {
     oscillator.frequency.setValueAtTime(basePitch, now);
     oscillator.frequency.exponentialRampToValueAtTime(basePitch * 1.5, now + 0.1);
     gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.045, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.045 * effectsLevel, now + 0.012);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
     oscillator.connect(gain);
     gain.connect(context.destination);
     oscillator.start(now);
     oscillator.stop(now + 0.17);
-  }, [isMuted]);
+  }, [effectsLevel, isMuted]);
 
   const playTierUpSignal = useCallback(() => {
     const context = audioContextRef.current;
@@ -309,14 +357,14 @@ export default function Home() {
       oscillator.type = "triangle";
       oscillator.frequency.setValueAtTime(index === 0 ? 392 : 587, now + offset);
       gain.gain.setValueAtTime(0.0001, now + offset);
-      gain.gain.exponentialRampToValueAtTime(0.05, now + offset + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.05 * effectsLevel, now + offset + 0.01);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.15);
       oscillator.connect(gain);
       gain.connect(context.destination);
       oscillator.start(now + offset);
       oscillator.stop(now + offset + 0.16);
     });
-  }, [isMuted]);
+  }, [effectsLevel, isMuted]);
 
   const playCollisionImpact = useCallback(() => {
     const context = audioContextRef.current;
@@ -329,13 +377,13 @@ export default function Home() {
     oscillator.frequency.setValueAtTime(138, now);
     oscillator.frequency.exponentialRampToValueAtTime(42, now + 0.22);
     gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.075, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.075 * effectsLevel, now + 0.012);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
     oscillator.connect(gain);
     gain.connect(context.destination);
     oscillator.start(now);
     oscillator.stop(now + 0.26);
-  }, [isMuted]);
+  }, [effectsLevel, isMuted]);
 
   const finishFlight = useCallback(() => {
     if (statusRef.current !== "playing") return;
@@ -485,7 +533,7 @@ export default function Home() {
 
         if (game.spawnClock >= spawnInterval) {
           game.spawnClock = 0;
-          if (isAsteroidMode) game.asteroids.push(randomAsteroid(game.nextId));
+          if (isAsteroidMode) game.asteroids.push(randomAsteroid(game.nextId, currentAsteroidDifficulty.level));
           else game.pipes.push(randomPipe(game.nextId));
           game.nextId += 1;
         }
@@ -511,16 +559,7 @@ export default function Home() {
           const hitsLower = playerBottom > pipe.top + PIPE_GAP;
           return hitsUpper || hitsLower;
         });
-        const hitAsteroid = game.asteroids.some((asteroid) => {
-          const playerCenterX = CHARACTER_X + CHARACTER_SIZE * .5;
-          const playerCenterY = game.y + CHARACTER_SIZE * .5;
-          const asteroidCenterX = asteroid.x + asteroid.size * .5;
-          const asteroidCenterY = asteroid.y + asteroid.size * .5;
-          const distanceX = playerCenterX - asteroidCenterX;
-          const distanceY = playerCenterY - asteroidCenterY;
-          const collisionRadius = CHARACTER_SIZE * .25 + asteroid.size * .3;
-          return distanceX * distanceX + distanceY * distanceY < collisionRadius * collisionRadius;
-        });
+        const hitAsteroid = game.asteroids.some((asteroid) => doesAsteroidHitPlayer(asteroid, game.y));
 
         game.pipes.forEach((pipe) => {
           if (pipe.x + PIPE_WIDTH < playerLeft && !(pipe as Pipe & { scored?: boolean }).scored) {
@@ -626,6 +665,32 @@ export default function Home() {
             >
               {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
             </button>
+            <button
+              type="button"
+              className="settings-toggle"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={() => setIsSettingsOpen((previous) => !previous)}
+              aria-expanded={isSettingsOpen}
+              aria-haspopup="dialog"
+              aria-label="Open audio settings"
+              title="Audio settings"
+            >
+              <SlidersHorizontal size={15} />
+            </button>
+            {isSettingsOpen && (
+              <section className="audio-settings" role="dialog" aria-label="Audio settings" onPointerDown={(event) => event.stopPropagation()}>
+                <div className="audio-settings__heading"><span>AUDIO</span><button type="button" onClick={() => setIsSettingsOpen(false)} aria-label="Close audio settings">×</button></div>
+                <label className="audio-slider">
+                  <span><strong>Music</strong><output>{musicVolume}%</output></span>
+                  <input type="range" min="0" max="100" step="1" value={musicVolume} onChange={(event) => updateMusicVolume(Number(event.target.value))} aria-label="Music volume" />
+                </label>
+                <label className="audio-slider">
+                  <span><strong>Effects</strong><output>{effectsVolume}%</output></span>
+                  <input type="range" min="0" max="100" step="1" value={effectsVolume} onChange={(event) => updateEffectsVolume(Number(event.target.value))} aria-label="Sound effects volume" />
+                </label>
+                <p>{isMuted ? "Muted — sliders are saved for later." : "Separate mix levels are saved."}</p>
+              </section>
+            )}
 
             {status === "playing" && (
               <button
@@ -700,7 +765,7 @@ export default function Home() {
                         <span className="mode-choice__glyph">✦</span><span><strong>Cosmic Gates</strong><small>Balanced flight</small></span>
                       </button>
                       <button type="button" className={`mode-choice mode-choice--asteroid ${gameMode === "asteroid" ? "is-selected" : ""}`} onPointerDown={(event) => event.stopPropagation()} onClick={() => chooseMode("asteroid")} aria-pressed={gameMode === "asteroid"}>
-                        <span className="mode-choice__glyph">☄</span><span><strong>Asteroid Field</strong><small>Ramps / 4 pts</small></span>
+                        <span className="mode-choice__glyph">☄</span><span><strong>Asteroid Field</strong><small>Ramps / 3 pts</small></span>
                       </button>
                     </div>
                   </div>
