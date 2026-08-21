@@ -7,4 +7,6 @@
 - [x] Add Tobi and Liam to the character selection interface.
 - [x] Use the selected character in the flight screen, pre-flight card, and score copy.
 - [x] Validate the selector and selected-character presentation.
+- [x] Produce and apply a Liam face cut-out matching Tobi’s treatment.
+- [x] Verify Liam’s face-shaped sprite is prominent in the picker and flight view.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.
