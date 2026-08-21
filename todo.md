@@ -27,4 +27,7 @@
 - [x] Build a direct Tobi-only cockpit treatment that remains visible while preserving Liam unchanged.
 - [x] Generate a Tobi image by preserving Liam’s cockpit artwork exactly and replacing only the face.
 - [x] Apply and verify the exact Liam-cockpit Tobi portrait across all pilot views.
+- [x] Remove the visible white background box from Tobi’s cockpit sprite.
+- [x] Verify the Tobi sprite edge is transparent in the selector and flight view.
+- [x] Mask the remaining Tobi image rectangle to the cockpit silhouette in the interface.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.
