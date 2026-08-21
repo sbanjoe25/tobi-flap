@@ -1,5 +1,5 @@
 /**
- * Orchard Arcade visual system: tactile storybook flight cabinet with a photo-first player character.
+ * Space Arcade visual system: dark collectible flight cabinet with a photo-first cockpit pilot.
  */
 import { Button } from "@/components/ui/button";
 import { ArrowUp, LayoutGrid, RotateCcw, Trophy, Volume2, VolumeX } from "lucide-react";
@@ -7,11 +7,21 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 type GameStatus = "ready" | "playing" | "gameover";
 type CharacterId = "tobi" | "liam";
+type GameMode = "normal" | "asteroid";
 
 type Pipe = {
   id: number;
   x: number;
   top: number;
+};
+
+type Asteroid = {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  spin: number;
+  scored?: boolean;
 };
 
 type HoverAudioNodes = {
@@ -32,6 +42,8 @@ const GRAVITY = 900;
 const FLAP_VELOCITY = -325;
 const PIPE_SPEED = 126;
 const PIPE_INTERVAL = 1.7;
+const ASTEROID_SPEED = 192;
+const ASTEROID_INTERVAL = 0.92;
 
 const logoImage = "/manus-storage/photo-flap-alien-logo_ea409bed.png";
 
@@ -61,11 +73,23 @@ const randomPipe = (id: number, x = STAGE_WIDTH + 30): Pipe => {
   };
 };
 
-function getInitialGame() {
+const randomAsteroid = (id: number, x = STAGE_WIDTH + 28): Asteroid => {
+  const size = 34 + Math.round(Math.random() * 29);
+  return {
+    id,
+    x,
+    y: 76 + Math.round(Math.random() * (STAGE_HEIGHT - GROUND_HEIGHT - 152 - size)),
+    size,
+    spin: 5.5 + Math.random() * 3.5,
+  };
+};
+
+function getInitialGame(mode: GameMode = "normal") {
   return {
     y: 276,
     velocity: 0,
-    pipes: [randomPipe(1, 430), randomPipe(2, 650)],
+    pipes: mode === "normal" ? [randomPipe(1, 430), randomPipe(2, 650)] : [],
+    asteroids: [] as Asteroid[],
     score: 0,
     nextId: 3,
     spawnClock: 0,
@@ -97,6 +121,26 @@ function PipeColumn({ pipe }: { pipe: Pipe }) {
   );
 }
 
+function AsteroidDebris({ asteroid }: { asteroid: Asteroid }) {
+  return (
+    <div
+      className="asteroid-debris"
+      style={{
+        left: `${(asteroid.x / STAGE_WIDTH) * 100}%`,
+        top: `${(asteroid.y / STAGE_HEIGHT) * 100}%`,
+        width: `${(asteroid.size / STAGE_WIDTH) * 100}%`,
+        aspectRatio: "1",
+        animationDuration: `${asteroid.spin}s`,
+      }}
+      aria-hidden="true"
+    >
+      <span className="asteroid-debris__crater asteroid-debris__crater--one" />
+      <span className="asteroid-debris__crater asteroid-debris__crater--two" />
+      <span className="asteroid-debris__crater asteroid-debris__crater--three" />
+    </div>
+  );
+}
+
 export default function Home() {
   const [status, setStatus] = useState<GameStatus>("ready");
   const [y, setY] = useState(276);
@@ -105,7 +149,9 @@ export default function Home() {
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
   const [selectedCharacterId, setSelectedCharacterId] = useState<CharacterId>("tobi");
+  const [gameMode, setGameMode] = useState<GameMode>("normal");
   const [isMuted, setIsMuted] = useState(false);
+  const [asteroids, setAsteroids] = useState<Asteroid[]>([]);
   const gameRef = useRef(getInitialGame());
   const statusRef = useRef<GameStatus>("ready");
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -117,14 +163,16 @@ export default function Home() {
   useEffect(() => {
     const storedCharacter = window.localStorage.getItem("tobi-flap-character") as CharacterId | null;
     if (storedCharacter === "tobi" || storedCharacter === "liam") setSelectedCharacterId(storedCharacter);
+    const storedMode = window.localStorage.getItem("tobi-flap-mode") as GameMode | null;
+    if (storedMode === "normal" || storedMode === "asteroid") setGameMode(storedMode);
     setIsMuted(window.localStorage.getItem("tobi-flap-muted") === "true");
   }, []);
 
   useEffect(() => {
-    const storedBest = window.localStorage.getItem(`tobi-flap-best-${selectedCharacterId}`);
+    const storedBest = window.localStorage.getItem(`tobi-flap-best-${selectedCharacterId}-${gameMode}`);
     if (storedBest) setBestScore(Number(storedBest) || 0);
     else setBestScore(0);
-  }, [selectedCharacterId]);
+  }, [gameMode, selectedCharacterId]);
 
   const stopHoverAudio = useCallback(() => {
     const nodes = hoverAudioRef.current;
@@ -200,21 +248,33 @@ export default function Home() {
     const finalScore = gameRef.current.score;
     setBestScore((previousBest) => {
       const nextBest = Math.max(previousBest, finalScore);
-      window.localStorage.setItem(`tobi-flap-best-${selectedCharacterId}`, String(nextBest));
+      window.localStorage.setItem(`tobi-flap-best-${selectedCharacterId}-${gameMode}`, String(nextBest));
       return nextBest;
     });
-  }, [selectedCharacterId]);
+  }, [gameMode, selectedCharacterId]);
 
   const resetFlight = useCallback((begin = false) => {
-    const nextGame = getInitialGame();
+    const nextGame = getInitialGame(gameMode);
     gameRef.current = nextGame;
     statusRef.current = begin ? "playing" : "ready";
     setStatus(begin ? "playing" : "ready");
     setY(nextGame.y);
     setVelocity(0);
     setPipes(nextGame.pipes);
+    setAsteroids(nextGame.asteroids);
     setScore(0);
-  }, []);
+  }, [gameMode]);
+
+  useEffect(() => {
+    if (statusRef.current !== "ready") return;
+    const nextGame = getInitialGame(gameMode);
+    gameRef.current = nextGame;
+    setY(nextGame.y);
+    setVelocity(0);
+    setPipes(nextGame.pipes);
+    setAsteroids(nextGame.asteroids);
+    setScore(0);
+  }, [gameMode]);
 
   const flap = useCallback(() => {
     startHoverAudio(selectedCharacterId);
@@ -240,6 +300,19 @@ export default function Home() {
     if (statusRef.current !== "ready") return;
     setSelectedCharacterId(characterId);
     window.localStorage.setItem("tobi-flap-character", characterId);
+  }, []);
+
+  const chooseMode = useCallback((mode: GameMode) => {
+    if (statusRef.current !== "ready") return;
+    setGameMode(mode);
+    window.localStorage.setItem("tobi-flap-mode", mode);
+    const nextGame = getInitialGame(mode);
+    gameRef.current = nextGame;
+    setY(nextGame.y);
+    setVelocity(0);
+    setPipes(nextGame.pipes);
+    setAsteroids(nextGame.asteroids);
+    setScore(0);
   }, []);
 
   const returnToMenu = useCallback(() => {
@@ -291,15 +364,22 @@ export default function Home() {
         game.y += game.velocity * deltaTime;
         game.spawnClock += deltaTime;
 
-        if (game.spawnClock >= PIPE_INTERVAL) {
+        const isAsteroidMode = gameMode === "asteroid";
+        const spawnInterval = isAsteroidMode ? ASTEROID_INTERVAL : PIPE_INTERVAL;
+
+        if (game.spawnClock >= spawnInterval) {
           game.spawnClock = 0;
-          game.pipes.push(randomPipe(game.nextId));
+          if (isAsteroidMode) game.asteroids.push(randomAsteroid(game.nextId));
+          else game.pipes.push(randomPipe(game.nextId));
           game.nextId += 1;
         }
 
         game.pipes = game.pipes
           .map((pipe) => ({ ...pipe, x: pipe.x - PIPE_SPEED * deltaTime }))
           .filter((pipe) => pipe.x > -PIPE_WIDTH - 4);
+        game.asteroids = game.asteroids
+          .map((asteroid) => ({ ...asteroid, x: asteroid.x - ASTEROID_SPEED * deltaTime }))
+          .filter((asteroid) => asteroid.x > -asteroid.size - 4);
 
         const playerLeft = CHARACTER_X - CHARACTER_SIZE / 2;
         const playerRight = CHARACTER_X + CHARACTER_SIZE / 2;
@@ -315,10 +395,26 @@ export default function Home() {
           const hitsLower = playerBottom > pipe.top + PIPE_GAP;
           return hitsUpper || hitsLower;
         });
+        const hitAsteroid = game.asteroids.some((asteroid) => {
+          const playerCenterX = CHARACTER_X + CHARACTER_SIZE * .5;
+          const playerCenterY = game.y + CHARACTER_SIZE * .5;
+          const asteroidCenterX = asteroid.x + asteroid.size * .5;
+          const asteroidCenterY = asteroid.y + asteroid.size * .5;
+          const distanceX = playerCenterX - asteroidCenterX;
+          const distanceY = playerCenterY - asteroidCenterY;
+          const collisionRadius = CHARACTER_SIZE * .25 + asteroid.size * .3;
+          return distanceX * distanceX + distanceY * distanceY < collisionRadius * collisionRadius;
+        });
 
         game.pipes.forEach((pipe) => {
           if (pipe.x + PIPE_WIDTH < playerLeft && !(pipe as Pipe & { scored?: boolean }).scored) {
             (pipe as Pipe & { scored?: boolean }).scored = true;
+            scoredThisFrame += 1;
+          }
+        });
+        game.asteroids.forEach((asteroid) => {
+          if (asteroid.x + asteroid.size < playerLeft && !asteroid.scored) {
+            asteroid.scored = true;
             scoredThisFrame += 1;
           }
         });
@@ -329,13 +425,14 @@ export default function Home() {
         }
 
         const hitBoundary = playerTop <= 0 || playerBottom >= STAGE_HEIGHT - GROUND_HEIGHT;
-        if (hitPipe || hitBoundary) {
+        if (hitPipe || hitAsteroid || hitBoundary) {
           finishFlight();
         }
 
         setY(game.y);
         setVelocity(game.velocity);
         setPipes([...game.pipes]);
+        setAsteroids([...game.asteroids]);
       }
 
       animationFrameRef.current = window.requestAnimationFrame(animate);
@@ -345,7 +442,7 @@ export default function Home() {
     return () => {
       if (animationFrameRef.current) window.cancelAnimationFrame(animationFrameRef.current);
     };
-  }, [finishFlight]);
+  }, [finishFlight, gameMode]);
 
   const characterAngle = Math.max(-20, Math.min(70, velocity * 0.09));
   const characterTop = (y / STAGE_HEIGHT) * 100;
@@ -372,7 +469,7 @@ export default function Home() {
           </header>
 
           <div
-            className={`game-stage game-stage--${status}`}
+            className={`game-stage game-stage--${status} game-stage--${gameMode}`}
             onPointerDown={flap}
             role="application"
             aria-label={`Tobi Flap game. ${selectedCharacter.name} is selected. Press Space, Arrow Up, or tap to flap.`}
@@ -418,6 +515,9 @@ export default function Home() {
             {pipes.map((pipe) => (
               <PipeColumn key={pipe.id} pipe={pipe} />
             ))}
+            {asteroids.map((asteroid) => (
+              <AsteroidDebris key={asteroid.id} asteroid={asteroid} />
+            ))}
 
             <div
               className={`photo-flier photo-flier--${selectedCharacter.id}`}
@@ -443,7 +543,7 @@ export default function Home() {
                     <div><span>YOUR PILOT</span><strong>{selectedCharacter.name} is ready</strong></div>
                   </div>
                   <p className="overlay-kicker">READY FOR TAKEOFF?</p>
-                  <h2>Thread the starfield.</h2>
+                  <h2>{gameMode === "asteroid" ? "Dodge the debris." : "Thread the starfield."}</h2>
                   <p>Tap the sky or press <kbd>SPACE</kbd> to launch.</p>
                   <div className="character-picker" aria-label="Choose a character">
                     <p>CHOOSE A PILOT</p>
@@ -466,9 +566,20 @@ export default function Home() {
                       })}
                     </div>
                   </div>
+                  <div className="mode-picker" aria-label="Choose a flight mode">
+                    <p>CHOOSE A MODE</p>
+                    <div className="mode-picker__choices">
+                      <button type="button" className={`mode-choice ${gameMode === "normal" ? "is-selected" : ""}`} onPointerDown={(event) => event.stopPropagation()} onClick={() => chooseMode("normal")} aria-pressed={gameMode === "normal"}>
+                        <span className="mode-choice__glyph">✦</span><span><strong>Cosmic Gates</strong><small>Balanced flight</small></span>
+                      </button>
+                      <button type="button" className={`mode-choice mode-choice--asteroid ${gameMode === "asteroid" ? "is-selected" : ""}`} onPointerDown={(event) => event.stopPropagation()} onClick={() => chooseMode("asteroid")} aria-pressed={gameMode === "asteroid"}>
+                        <span className="mode-choice__glyph">☄</span><span><strong>Asteroid Field</strong><small>Fast debris dodge</small></span>
+                      </button>
+                    </div>
+                  </div>
                   <Button className="launch-button" onPointerDown={(event) => event.stopPropagation()} onClick={flap}>
                     <ArrowUp size={18} />
-                    Fly with {selectedCharacter.name}
+                    {gameMode === "asteroid" ? "Launch Asteroid Field" : `Fly with ${selectedCharacter.name}`}
                   </Button>
                 </div>
               </div>
@@ -477,7 +588,7 @@ export default function Home() {
             {status === "gameover" && (
               <div className="game-overlay game-overlay--over">
                 <div className="game-overlay__card game-overlay__card--over">
-                  <p className="overlay-kicker">COSMIC LANDING</p>
+                  <p className="overlay-kicker">{gameMode === "asteroid" ? "FIELD EXIT" : "COSMIC LANDING"}</p>
                   <h2>{selectedCharacter.name}'s flight!</h2>
                   <div className="result-row">
                     <span>THIS FLIGHT</span>

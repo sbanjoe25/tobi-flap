@@ -56,4 +56,8 @@
 - [x] Update supporting copy and labels from orchard flight to space flight.
 - [x] Preserve the cockpit game’s visibility and interactions against the new dark theme.
 - [x] Validate the dark cosmic theme on desktop and mobile.
-- [ ] Validate the updated responsive interface and save a delivery checkpoint.
+- [x] Add a Normal / Asteroid Field mode selector to the pre-flight screen.
+- [x] Implement asteroid debris obstacles and challenge-mode collision checks.
+- [x] Tune Asteroid Field for a faster, score-focused flight challenge.
+- [x] Validate the challenge mode controls and obstacle presentation.
+- [x] Validate the updated responsive interface and save a delivery checkpoint.
