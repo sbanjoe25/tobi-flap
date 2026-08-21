@@ -77,3 +77,6 @@
 - [x] Make asteroid collision detection match the visible debris shape reliably.
 - [x] Apply progression to both existing and newly spawned asteroids with clear tier feedback.
 - [x] Validate settings, collision, and difficulty behavior and save a delivery checkpoint.
+- [x] Replace score-driven Asteroid Field tiers with a 30-second survival cadence.
+- [x] Update challenge copy and threat feedback to explain the slower timed progression.
+- [x] Validate timed escalation and save a delivery checkpoint.

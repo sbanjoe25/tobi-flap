@@ -45,12 +45,13 @@ const GRAVITY = 900;
 const FLAP_VELOCITY = -325;
 const PIPE_SPEED = 126;
 const PIPE_INTERVAL = 1.7;
+const THREAT_TIER_INTERVAL = 30;
 const ASTEROID_DIFFICULTY_TIERS = [
-  { minimumScore: 0, level: 1, label: "SCOUT", speed: 192, interval: 0.92 },
-  { minimumScore: 3, level: 2, label: "RUSH", speed: 236, interval: 0.78 },
-  { minimumScore: 6, level: 3, label: "SURGE", speed: 280, interval: 0.66 },
-  { minimumScore: 9, level: 4, label: "NOVA", speed: 324, interval: 0.55 },
-  { minimumScore: 12, level: 5, label: "ECLIPSE", speed: 360, interval: 0.48 },
+  { level: 1, label: "SCOUT", speed: 192, interval: 0.92 },
+  { level: 2, label: "RUSH", speed: 236, interval: 0.78 },
+  { level: 3, label: "SURGE", speed: 280, interval: 0.66 },
+  { level: 4, label: "NOVA", speed: 324, interval: 0.55 },
+  { level: 5, label: "ECLIPSE", speed: 360, interval: 0.48 },
 ] as const;
 
 const logoImage = "/manus-storage/photo-flap-alien-logo_ea409bed.png";
@@ -93,8 +94,8 @@ const randomAsteroid = (id: number, difficultyLevel = 1, x = STAGE_WIDTH + 28): 
   };
 };
 
-const getAsteroidDifficulty = (currentScore: number) =>
-  [...ASTEROID_DIFFICULTY_TIERS].reverse().find((tier) => currentScore >= tier.minimumScore) ?? ASTEROID_DIFFICULTY_TIERS[0];
+const getAsteroidDifficulty = (survivalSeconds: number) =>
+  ASTEROID_DIFFICULTY_TIERS[Math.min(Math.floor(survivalSeconds / THREAT_TIER_INTERVAL), ASTEROID_DIFFICULTY_TIERS.length - 1)];
 
 const clampVolume = (value: number) => Math.min(100, Math.max(0, value));
 
@@ -116,6 +117,7 @@ function getInitialGame(mode: GameMode = "normal") {
     pipes: mode === "normal" ? [randomPipe(1, 430), randomPipe(2, 650)] : [],
     asteroids: [] as Asteroid[],
     score: 0,
+    survivalSeconds: 0,
     nextId: 3,
     spawnClock: 0,
     lastTimestamp: 0,
@@ -172,6 +174,7 @@ export default function Home() {
   const [velocity, setVelocity] = useState(0);
   const [pipes, setPipes] = useState<Pipe[]>(() => getInitialGame().pipes);
   const [score, setScore] = useState(0);
+  const [survivalSeconds, setSurvivalSeconds] = useState(0);
   const [bestScore, setBestScore] = useState(0);
   const [selectedCharacterId, setSelectedCharacterId] = useState<CharacterId>("tobi");
   const [gameMode, setGameMode] = useState<GameMode>("normal");
@@ -188,7 +191,8 @@ export default function Home() {
   const backgroundMusicRef = useRef<HTMLAudioElement | null>(null);
 
   const selectedCharacter = CHARACTERS.find((character) => character.id === selectedCharacterId) ?? CHARACTERS[0];
-  const asteroidDifficulty = getAsteroidDifficulty(score);
+  const asteroidDifficulty = getAsteroidDifficulty(survivalSeconds);
+  const nextThreatIn = asteroidDifficulty.level === ASTEROID_DIFFICULTY_TIERS.length ? 0 : THREAT_TIER_INTERVAL - (survivalSeconds % THREAT_TIER_INTERVAL);
   const effectsLevel = effectsVolume / 100;
 
   useEffect(() => {
@@ -410,6 +414,7 @@ export default function Home() {
     setPipes(nextGame.pipes);
     setAsteroids(nextGame.asteroids);
     setScore(0);
+    setSurvivalSeconds(0);
   }, [gameMode]);
 
   useEffect(() => {
@@ -421,6 +426,7 @@ export default function Home() {
     setPipes(nextGame.pipes);
     setAsteroids(nextGame.asteroids);
     setScore(0);
+    setSurvivalSeconds(0);
   }, [gameMode]);
 
   const flap = useCallback((allowLaunch = false) => {
@@ -466,6 +472,7 @@ export default function Home() {
     setPipes(nextGame.pipes);
     setAsteroids(nextGame.asteroids);
     setScore(0);
+    setSurvivalSeconds(0);
   }, []);
 
   const returnToMenu = useCallback(() => {
@@ -523,13 +530,20 @@ export default function Home() {
       game.lastTimestamp = timestamp;
 
       if (statusRef.current === "playing") {
+        const priorSurvivalSeconds = game.survivalSeconds;
         game.velocity += GRAVITY * deltaTime;
         game.y += game.velocity * deltaTime;
         game.spawnClock += deltaTime;
+        game.survivalSeconds += deltaTime;
 
         const isAsteroidMode = gameMode === "asteroid";
-        const currentAsteroidDifficulty = getAsteroidDifficulty(game.score);
+        const currentAsteroidDifficulty = getAsteroidDifficulty(game.survivalSeconds);
         const spawnInterval = isAsteroidMode ? currentAsteroidDifficulty.interval : PIPE_INTERVAL;
+
+        if (isAsteroidMode && Math.floor(game.survivalSeconds / THREAT_TIER_INTERVAL) > Math.floor(priorSurvivalSeconds / THREAT_TIER_INTERVAL)) {
+          playTierUpSignal();
+        }
+        if (Math.floor(game.survivalSeconds) !== Math.floor(priorSurvivalSeconds)) setSurvivalSeconds(Math.floor(game.survivalSeconds));
 
         if (game.spawnClock >= spawnInterval) {
           game.spawnClock = 0;
@@ -575,11 +589,9 @@ export default function Home() {
         });
 
         if (scoredThisFrame > 0) {
-          const priorDifficulty = getAsteroidDifficulty(game.score);
           game.score += scoredThisFrame;
           setScore(game.score);
           playScoreChime(game.score);
-          if (isAsteroidMode && getAsteroidDifficulty(game.score).level > priorDifficulty.level) playTierUpSignal();
         }
 
         const hitBoundary = playerTop <= 0 || playerBottom >= STAGE_HEIGHT - GROUND_HEIGHT;
@@ -647,10 +659,10 @@ export default function Home() {
               <strong>{score}</strong>
             </div>
             {gameMode === "asteroid" && (
-              <div className={`threat-pill threat-pill--${asteroidDifficulty.level}`} aria-live="polite" aria-label={`Asteroid Field threat level ${asteroidDifficulty.level}: ${asteroidDifficulty.label}`}>
+              <div className={`threat-pill threat-pill--${asteroidDifficulty.level}`} aria-live="polite" aria-label={`Asteroid Field threat level ${asteroidDifficulty.level}: ${asteroidDifficulty.label}${nextThreatIn ? `. Next level in ${nextThreatIn} seconds` : ". Maximum threat reached"}`}>
                 <span>THREAT</span>
                 <strong>LV {asteroidDifficulty.level}</strong>
-                <small>{asteroidDifficulty.label}</small>
+                <small>{nextThreatIn ? `${asteroidDifficulty.label} · NEXT ${nextThreatIn}s` : "MAX THREAT"}</small>
               </div>
             )}
 
@@ -765,7 +777,7 @@ export default function Home() {
                         <span className="mode-choice__glyph">✦</span><span><strong>Cosmic Gates</strong><small>Balanced flight</small></span>
                       </button>
                       <button type="button" className={`mode-choice mode-choice--asteroid ${gameMode === "asteroid" ? "is-selected" : ""}`} onPointerDown={(event) => event.stopPropagation()} onClick={() => chooseMode("asteroid")} aria-pressed={gameMode === "asteroid"}>
-                        <span className="mode-choice__glyph">☄</span><span><strong>Asteroid Field</strong><small>Ramps / 3 pts</small></span>
+                        <span className="mode-choice__glyph">☄</span><span><strong>Asteroid Field</strong><small>Ramps / 30s</small></span>
                       </button>
                     </div>
                   </div>
