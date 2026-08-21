@@ -20,4 +20,9 @@
 - [x] Verify the matched Tobi and Liam cockpit views across selection and flight.
 - [x] Remove Tobi’s remaining distinct portrait framing and match Liam’s integrated cockpit layout.
 - [x] Verify the corrected Tobi cockpit treatment in the visible character selector.
+- [x] Restore Liam’s prior peach-and-cream cockpit design unchanged.
+- [x] Apply that cockpit design to Tobi only, preserving Tobi’s green accent details.
+- [x] Validate both pilot designs against the confirmed visual direction.
+- [x] Recreate only Tobi’s cockpit with Liam’s peach-and-cream layout and subtle green accents.
+- [x] Build a direct Tobi-only cockpit treatment that remains visible while preserving Liam unchanged.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.

@@ -309,13 +309,13 @@ export default function Home() {
             ))}
 
             <div
-              className={`photo-flier photo-flier--${selectedCharacter.id} cockpit-frame`}
+              className={`photo-flier photo-flier--${selectedCharacter.id} ${selectedCharacter.id === "tobi" ? "tobi-cockpit" : ""}`}
               style={{ left: `${(CHARACTER_X / STAGE_WIDTH) * 100}%`, top: `${characterTop}%`, transform: `translate(-50%, -50%) rotate(${characterAngle}deg)` }}
               aria-hidden="true"
             >
-              <span className="cockpit-canopy" />
+              {selectedCharacter.id === "tobi" && <span className="tobi-cockpit__canopy" />}
               <img src={selectedCharacter.image} alt="" />
-              <span className="cockpit-dashboard" />
+              {selectedCharacter.id === "tobi" && <span className="tobi-cockpit__dashboard" />}
             </div>
 
             <div className="orchard-ground">
@@ -327,7 +327,7 @@ export default function Home() {
               <div className="game-overlay game-overlay--start">
               <div className="game-overlay__card">
                   <div className="pilot-badge">
-                    <div className={`pilot-badge__portrait pilot-badge__portrait--${selectedCharacter.id} cockpit-frame cockpit-frame--mini`}><span className="cockpit-canopy" /><img src={selectedCharacter.image} alt="" /><span className="cockpit-dashboard" /></div>
+                    <div className={`pilot-badge__portrait pilot-badge__portrait--${selectedCharacter.id} ${selectedCharacter.id === "tobi" ? "tobi-cockpit tobi-cockpit--mini" : ""}`}>{selectedCharacter.id === "tobi" && <span className="tobi-cockpit__canopy" />}<img src={selectedCharacter.image} alt="" />{selectedCharacter.id === "tobi" && <span className="tobi-cockpit__dashboard" />}</div>
                     <div><span>YOUR PILOT</span><strong>{selectedCharacter.name} is ready</strong></div>
                   </div>
                   <p className="overlay-kicker">READY FOR TAKEOFF?</p>
@@ -347,7 +347,7 @@ export default function Home() {
                             onClick={() => chooseCharacter(character.id)}
                             aria-pressed={isSelected}
                           >
-                            <span className="character-choice__portrait cockpit-frame cockpit-frame--mini"><span className="cockpit-canopy" /><img src={character.image} alt="" /><span className="cockpit-dashboard" /></span>
+                            <span className={`character-choice__portrait ${character.id === "tobi" ? "tobi-cockpit tobi-cockpit--mini" : ""}`}>{character.id === "tobi" && <span className="tobi-cockpit__canopy" />}<img src={character.image} alt="" />{character.id === "tobi" && <span className="tobi-cockpit__dashboard" />}</span>
                             <span><strong>{character.name}</strong><small>{character.note}</small></span>
                           </button>
                         );
