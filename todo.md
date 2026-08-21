@@ -35,4 +35,6 @@
 - [x] Verify the refined Tobi cockpit in the selector and flight view.
 - [x] Remove the remaining white edge fringe from Tobi’s cockpit sprite.
 - [x] Verify the Tobi spacecraft edge is clean against the sky background.
+- [x] Add a subtle multi-layer cockpit shadow for visual depth.
+- [x] Verify the shadow remains soft and unobtrusive in the game view.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.
