@@ -2,10 +2,10 @@
  * Space Arcade visual system: dark collectible flight cabinet with a photo-first cockpit pilot.
  */
 import { Button } from "@/components/ui/button";
+import { canAcceptFlap, clampVolume, doesAsteroidHitPlayer, getAsteroidDifficulty, getSecondsUntilNextThreat, THREAT_TIER_INTERVAL, type Asteroid, type GameStatus } from "@/lib/game";
 import { ArrowUp, LayoutGrid, RotateCcw, SlidersHorizontal, Trophy, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type GameStatus = "ready" | "playing" | "gameover";
 type CharacterId = "tobi" | "liam";
 type GameMode = "normal" | "asteroid";
 
@@ -13,15 +13,6 @@ type Pipe = {
   id: number;
   x: number;
   top: number;
-};
-
-type Asteroid = {
-  id: number;
-  x: number;
-  y: number;
-  size: number;
-  spin: number;
-  scored?: boolean;
 };
 
 type HoverAudioNodes = {
@@ -37,22 +28,12 @@ const STAGE_HEIGHT = 640;
 const GROUND_HEIGHT = 56;
 const CHARACTER_SIZE = 58;
 const CHARACTER_X = 98;
-const PLAYER_COLLISION_HALF_WIDTH = 37;
-const PLAYER_COLLISION_HALF_HEIGHT = 34;
 const PIPE_WIDTH = 76;
 const PIPE_GAP = 224;
 const GRAVITY = 900;
 const FLAP_VELOCITY = -325;
 const PIPE_SPEED = 126;
 const PIPE_INTERVAL = 1.7;
-const THREAT_TIER_INTERVAL = 30;
-const ASTEROID_DIFFICULTY_TIERS = [
-  { level: 1, label: "SCOUT", speed: 192, interval: 0.92 },
-  { level: 2, label: "RUSH", speed: 236, interval: 0.78 },
-  { level: 3, label: "SURGE", speed: 280, interval: 0.66 },
-  { level: 4, label: "NOVA", speed: 324, interval: 0.55 },
-  { level: 5, label: "ECLIPSE", speed: 360, interval: 0.48 },
-] as const;
 
 const logoImage = "/manus-storage/photo-flap-alien-logo_ea409bed.png";
 const soundtrackUrl = "/manus-storage/tobi-flap-space-arcade-loop_c4d9f30e.mp3";
@@ -62,13 +43,13 @@ const CHARACTERS: Array<{ id: CharacterId; name: string; image: string; note: st
     id: "tobi",
     name: "Tobi",
     image: "/manus-storage/tobi-flap-tobi-cockpit-edge-clean_34dda769.png",
-    note: "Orchard original",
+    note: "Orbit scout",
   },
   {
     id: "liam",
     name: "Liam",
     image: "/manus-storage/tobi-flap-liam-cockpit-cutout_8fd6ac54.png",
-    note: "Wide-eyed wonder",
+    note: "Comet copilot",
   },
 ];
 
@@ -92,22 +73,6 @@ const randomAsteroid = (id: number, difficultyLevel = 1, x = STAGE_WIDTH + 28): 
     size,
     spin: 5.5 + Math.random() * 3.5,
   };
-};
-
-const getAsteroidDifficulty = (survivalSeconds: number) =>
-  ASTEROID_DIFFICULTY_TIERS[Math.min(Math.floor(survivalSeconds / THREAT_TIER_INTERVAL), ASTEROID_DIFFICULTY_TIERS.length - 1)];
-
-const clampVolume = (value: number) => Math.min(100, Math.max(0, value));
-
-const doesAsteroidHitPlayer = (asteroid: Asteroid, playerY: number) => {
-  const asteroidCenterX = asteroid.x + asteroid.size * .5;
-  const asteroidCenterY = asteroid.y + asteroid.size * .5;
-  const closestX = Math.max(CHARACTER_X - PLAYER_COLLISION_HALF_WIDTH, Math.min(asteroidCenterX, CHARACTER_X + PLAYER_COLLISION_HALF_WIDTH));
-  const closestY = Math.max(playerY - PLAYER_COLLISION_HALF_HEIGHT, Math.min(asteroidCenterY, playerY + PLAYER_COLLISION_HALF_HEIGHT));
-  const distanceX = asteroidCenterX - closestX;
-  const distanceY = asteroidCenterY - closestY;
-  const asteroidRadius = asteroid.size * .46;
-  return distanceX * distanceX + distanceY * distanceY <= asteroidRadius * asteroidRadius;
 };
 
 function getInitialGame(mode: GameMode = "normal") {
@@ -192,7 +157,7 @@ export default function Home() {
 
   const selectedCharacter = CHARACTERS.find((character) => character.id === selectedCharacterId) ?? CHARACTERS[0];
   const asteroidDifficulty = getAsteroidDifficulty(survivalSeconds);
-  const nextThreatIn = asteroidDifficulty.level === ASTEROID_DIFFICULTY_TIERS.length ? 0 : THREAT_TIER_INTERVAL - (survivalSeconds % THREAT_TIER_INTERVAL);
+  const nextThreatIn = getSecondsUntilNextThreat(survivalSeconds);
   const effectsLevel = effectsVolume / 100;
 
   useEffect(() => {
@@ -430,8 +395,9 @@ export default function Home() {
   }, [gameMode]);
 
   const flap = useCallback((allowLaunch = false) => {
+    if (!canAcceptFlap(statusRef.current, allowLaunch)) return;
+
     if (statusRef.current === "gameover") {
-      if (!allowLaunch) return;
       startHoverAudio(selectedCharacterId);
       playFlapChirp(selectedCharacterId);
       resetFlight(true);
@@ -442,7 +408,6 @@ export default function Home() {
     }
 
     if (statusRef.current === "ready") {
-      if (!allowLaunch) return;
       statusRef.current = "playing";
       setStatus("playing");
     }

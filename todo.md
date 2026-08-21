@@ -80,3 +80,8 @@
 - [x] Replace score-driven Asteroid Field tiers with a 30-second survival cadence.
 - [x] Update challenge copy and threat feedback to explain the slower timed progression.
 - [x] Validate timed escalation and save a delivery checkpoint.
+- [x] Update the menu descriptions for Tobi and Liam.
+- [x] Extract deterministic game helpers and add unit tests for core game scenarios.
+- [x] Add a Makefile covering local install, development, checks, tests, and builds.
+- [x] Run the full validation suite and document local setup.
+- [ ] Create a private GitHub repository and push the completed project.
