@@ -16,4 +16,6 @@
 - [x] Generate a clean, high-prominence Liam face cut-out with no background artifacts.
 - [x] Integrate Liam’s refined face cleanly into the same cockpit treatment as Tobi.
 - [x] Validate Liam’s card, pilot badge, and in-flight cockpit presentation.
+- [x] Generate and apply a Tobi cockpit pilot cut-out matching Liam’s layout.
+- [x] Verify the matched Tobi and Liam cockpit views across selection and flight.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.
