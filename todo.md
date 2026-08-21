@@ -68,3 +68,7 @@
 - [x] Prevent pre-flight backdrop taps from launching the game.
 - [x] Preserve tap and keyboard flapping once a flight has started.
 - [x] Validate launch-button-only behavior and save a delivery checkpoint.
+- [x] Define a Space Arcade music loop and gameplay sound-effect palette.
+- [x] Add background music and event-driven game sound effects.
+- [x] Integrate new audio with mute state and browser-gesture playback rules.
+- [x] Validate the audio experience and save a delivery checkpoint.

@@ -50,6 +50,7 @@ const ASTEROID_DIFFICULTY_TIERS = [
 ] as const;
 
 const logoImage = "/manus-storage/photo-flap-alien-logo_ea409bed.png";
+const soundtrackUrl = "/manus-storage/tobi-flap-space-arcade-loop_c4d9f30e.mp3";
 
 const CHARACTERS: Array<{ id: CharacterId; name: string; image: string; note: string }> = [
   {
@@ -164,6 +165,7 @@ export default function Home() {
   const animationFrameRef = useRef<number | undefined>(undefined);
   const audioContextRef = useRef<AudioContext | null>(null);
   const hoverAudioRef = useRef<HoverAudioNodes | null>(null);
+  const backgroundMusicRef = useRef<HTMLAudioElement | null>(null);
 
   const selectedCharacter = CHARACTERS.find((character) => character.id === selectedCharacterId) ?? CHARACTERS[0];
   const asteroidDifficulty = getAsteroidDifficulty(score);
@@ -181,6 +183,21 @@ export default function Home() {
     if (storedBest) setBestScore(Number(storedBest) || 0);
     else setBestScore(0);
   }, [gameMode, selectedCharacterId]);
+
+  useEffect(() => {
+    const soundtrack = new Audio(soundtrackUrl);
+    soundtrack.loop = true;
+    soundtrack.preload = "auto";
+    soundtrack.volume = 0.16;
+    backgroundMusicRef.current = soundtrack;
+
+    return () => {
+      soundtrack.pause();
+      soundtrack.removeAttribute("src");
+      soundtrack.load();
+      backgroundMusicRef.current = null;
+    };
+  }, []);
 
   const stopHoverAudio = useCallback(() => {
     const nodes = hoverAudioRef.current;
@@ -247,9 +264,83 @@ export default function Home() {
     oscillator.stop(now + 0.15);
   }, [isMuted]);
 
+  const stopBackgroundMusic = useCallback(() => {
+    const soundtrack = backgroundMusicRef.current;
+    if (!soundtrack) return;
+    soundtrack.pause();
+    soundtrack.currentTime = 0;
+  }, []);
+
+  const startBackgroundMusic = useCallback((forcePlayback = false) => {
+    const soundtrack = backgroundMusicRef.current;
+    if (!soundtrack || (isMuted && !forcePlayback) || statusRef.current !== "playing") return;
+    const playback = soundtrack.play();
+    if (playback) void playback.catch(() => undefined);
+  }, [isMuted]);
+
+  const playScoreChime = useCallback((currentScore: number) => {
+    const context = audioContextRef.current;
+    if (isMuted || !context) return;
+
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const now = context.currentTime;
+    const basePitch = 510 + (currentScore % 3) * 45;
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(basePitch, now);
+    oscillator.frequency.exponentialRampToValueAtTime(basePitch * 1.5, now + 0.1);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.045, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.17);
+  }, [isMuted]);
+
+  const playTierUpSignal = useCallback(() => {
+    const context = audioContextRef.current;
+    if (isMuted || !context) return;
+
+    const now = context.currentTime;
+    [0, 0.09].forEach((offset, index) => {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = "triangle";
+      oscillator.frequency.setValueAtTime(index === 0 ? 392 : 587, now + offset);
+      gain.gain.setValueAtTime(0.0001, now + offset);
+      gain.gain.exponentialRampToValueAtTime(0.05, now + offset + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.15);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start(now + offset);
+      oscillator.stop(now + offset + 0.16);
+    });
+  }, [isMuted]);
+
+  const playCollisionImpact = useCallback(() => {
+    const context = audioContextRef.current;
+    if (isMuted || !context) return;
+
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const now = context.currentTime;
+    oscillator.type = "sawtooth";
+    oscillator.frequency.setValueAtTime(138, now);
+    oscillator.frequency.exponentialRampToValueAtTime(42, now + 0.22);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.075, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.26);
+  }, [isMuted]);
+
   const finishFlight = useCallback(() => {
     if (statusRef.current !== "playing") return;
 
+    stopBackgroundMusic();
     statusRef.current = "gameover";
     setStatus("gameover");
 
@@ -259,7 +350,7 @@ export default function Home() {
       window.localStorage.setItem(`tobi-flap-best-${selectedCharacterId}-${gameMode}`, String(nextBest));
       return nextBest;
     });
-  }, [gameMode, selectedCharacterId]);
+  }, [gameMode, selectedCharacterId, stopBackgroundMusic]);
 
   const resetFlight = useCallback((begin = false) => {
     const nextGame = getInitialGame(gameMode);
@@ -290,6 +381,7 @@ export default function Home() {
       startHoverAudio(selectedCharacterId);
       playFlapChirp(selectedCharacterId);
       resetFlight(true);
+      startBackgroundMusic();
       gameRef.current.velocity = FLAP_VELOCITY;
       setVelocity(FLAP_VELOCITY);
       return;
@@ -304,9 +396,10 @@ export default function Home() {
     if (statusRef.current !== "playing") return;
     startHoverAudio(selectedCharacterId);
     playFlapChirp(selectedCharacterId);
+    startBackgroundMusic();
     gameRef.current.velocity = FLAP_VELOCITY;
     setVelocity(FLAP_VELOCITY);
-  }, [playFlapChirp, resetFlight, selectedCharacterId, startHoverAudio]);
+  }, [playFlapChirp, resetFlight, selectedCharacterId, startBackgroundMusic, startHoverAudio]);
 
   const chooseCharacter = useCallback((characterId: CharacterId) => {
     if (statusRef.current !== "ready") return;
@@ -335,21 +428,30 @@ export default function Home() {
     setIsMuted((previous) => {
       const next = !previous;
       window.localStorage.setItem("tobi-flap-muted", String(next));
-      if (next) stopHoverAudio();
+      if (next) {
+        stopHoverAudio();
+        stopBackgroundMusic();
+      } else if (statusRef.current === "playing") {
+        startBackgroundMusic(true);
+      }
       return next;
     });
-  }, [stopHoverAudio]);
+  }, [startBackgroundMusic, stopBackgroundMusic, stopHoverAudio]);
 
   useEffect(() => {
-    if (status !== "playing" || isMuted) stopHoverAudio();
-  }, [isMuted, status, stopHoverAudio]);
+    if (status !== "playing" || isMuted) {
+      stopHoverAudio();
+      stopBackgroundMusic();
+    }
+  }, [isMuted, status, stopBackgroundMusic, stopHoverAudio]);
 
   useEffect(() => {
     return () => {
       stopHoverAudio();
+      stopBackgroundMusic();
       void audioContextRef.current?.close();
     };
-  }, [stopHoverAudio]);
+  }, [stopBackgroundMusic, stopHoverAudio]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -434,12 +536,16 @@ export default function Home() {
         });
 
         if (scoredThisFrame > 0) {
+          const priorDifficulty = getAsteroidDifficulty(game.score);
           game.score += scoredThisFrame;
           setScore(game.score);
+          playScoreChime(game.score);
+          if (isAsteroidMode && getAsteroidDifficulty(game.score).level > priorDifficulty.level) playTierUpSignal();
         }
 
         const hitBoundary = playerTop <= 0 || playerBottom >= STAGE_HEIGHT - GROUND_HEIGHT;
         if (hitPipe || hitAsteroid || hitBoundary) {
+          playCollisionImpact();
           finishFlight();
         }
 
@@ -456,7 +562,7 @@ export default function Home() {
     return () => {
       if (animationFrameRef.current) window.cancelAnimationFrame(animationFrameRef.current);
     };
-  }, [finishFlight, gameMode]);
+  }, [finishFlight, gameMode, playCollisionImpact, playScoreChime, playTierUpSignal]);
 
   const characterAngle = Math.max(-20, Math.min(70, velocity * 0.09));
   const characterTop = (y / STAGE_HEIGHT) * 100;
