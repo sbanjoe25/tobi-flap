@@ -25,4 +25,6 @@
 - [x] Validate both pilot designs against the confirmed visual direction.
 - [x] Recreate only Tobi’s cockpit with Liam’s peach-and-cream layout and subtle green accents.
 - [x] Build a direct Tobi-only cockpit treatment that remains visible while preserving Liam unchanged.
+- [x] Generate a Tobi image by preserving Liam’s cockpit artwork exactly and replacing only the face.
+- [x] Apply and verify the exact Liam-cockpit Tobi portrait across all pilot views.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.

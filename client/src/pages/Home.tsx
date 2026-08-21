@@ -34,7 +34,7 @@ const CHARACTERS: Array<{ id: CharacterId; name: string; image: string; note: st
   {
     id: "tobi",
     name: "Tobi",
-    image: "/manus-storage/photo-flap-face-cutout_38daf8a2.png",
+    image: "/manus-storage/tobi-flap-tobi-exact-liam-cockpit_b930a028.png",
     note: "Orchard original",
   },
   {
@@ -309,13 +309,11 @@ export default function Home() {
             ))}
 
             <div
-              className={`photo-flier photo-flier--${selectedCharacter.id} ${selectedCharacter.id === "tobi" ? "tobi-cockpit" : ""}`}
+              className={`photo-flier photo-flier--${selectedCharacter.id}`}
               style={{ left: `${(CHARACTER_X / STAGE_WIDTH) * 100}%`, top: `${characterTop}%`, transform: `translate(-50%, -50%) rotate(${characterAngle}deg)` }}
               aria-hidden="true"
             >
-              {selectedCharacter.id === "tobi" && <span className="tobi-cockpit__canopy" />}
               <img src={selectedCharacter.image} alt="" />
-              {selectedCharacter.id === "tobi" && <span className="tobi-cockpit__dashboard" />}
             </div>
 
             <div className="orchard-ground">
@@ -327,7 +325,7 @@ export default function Home() {
               <div className="game-overlay game-overlay--start">
               <div className="game-overlay__card">
                   <div className="pilot-badge">
-                    <div className={`pilot-badge__portrait pilot-badge__portrait--${selectedCharacter.id} ${selectedCharacter.id === "tobi" ? "tobi-cockpit tobi-cockpit--mini" : ""}`}>{selectedCharacter.id === "tobi" && <span className="tobi-cockpit__canopy" />}<img src={selectedCharacter.image} alt="" />{selectedCharacter.id === "tobi" && <span className="tobi-cockpit__dashboard" />}</div>
+                    <div className={`pilot-badge__portrait pilot-badge__portrait--${selectedCharacter.id}`}><img src={selectedCharacter.image} alt="" /></div>
                     <div><span>YOUR PILOT</span><strong>{selectedCharacter.name} is ready</strong></div>
                   </div>
                   <p className="overlay-kicker">READY FOR TAKEOFF?</p>
@@ -347,7 +345,7 @@ export default function Home() {
                             onClick={() => chooseCharacter(character.id)}
                             aria-pressed={isSelected}
                           >
-                            <span className={`character-choice__portrait ${character.id === "tobi" ? "tobi-cockpit tobi-cockpit--mini" : ""}`}>{character.id === "tobi" && <span className="tobi-cockpit__canopy" />}<img src={character.image} alt="" />{character.id === "tobi" && <span className="tobi-cockpit__dashboard" />}</span>
+                            <span className="character-choice__portrait"><img src={character.image} alt="" /></span>
                             <span><strong>{character.name}</strong><small>{character.note}</small></span>
                           </button>
                         );
