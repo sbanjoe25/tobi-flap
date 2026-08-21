@@ -2,7 +2,7 @@
  * Orchard Arcade visual system: tactile storybook flight cabinet with a photo-first player character.
  */
 import { Button } from "@/components/ui/button";
-import { ArrowUp, LayoutGrid, RotateCcw, Trophy } from "lucide-react";
+import { ArrowUp, LayoutGrid, RotateCcw, Trophy, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type GameStatus = "ready" | "playing" | "gameover";
@@ -100,15 +100,18 @@ export default function Home() {
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
   const [selectedCharacterId, setSelectedCharacterId] = useState<CharacterId>("tobi");
+  const [isMuted, setIsMuted] = useState(false);
   const gameRef = useRef(getInitialGame());
   const statusRef = useRef<GameStatus>("ready");
   const animationFrameRef = useRef<number | undefined>(undefined);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   const selectedCharacter = CHARACTERS.find((character) => character.id === selectedCharacterId) ?? CHARACTERS[0];
 
   useEffect(() => {
     const storedCharacter = window.localStorage.getItem("tobi-flap-character") as CharacterId | null;
     if (storedCharacter === "tobi" || storedCharacter === "liam") setSelectedCharacterId(storedCharacter);
+    setIsMuted(window.localStorage.getItem("tobi-flap-muted") === "true");
   }, []);
 
   useEffect(() => {
@@ -168,6 +171,60 @@ export default function Home() {
   const returnToMenu = useCallback(() => {
     resetFlight(false);
   }, [resetFlight]);
+
+  const toggleMute = useCallback(() => {
+    setIsMuted((previous) => {
+      const next = !previous;
+      window.localStorage.setItem("tobi-flap-muted", String(next));
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (status !== "playing" || isMuted) return;
+
+    const AudioContextConstructor = window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextConstructor) return;
+
+    const context = audioContextRef.current ?? new AudioContextConstructor();
+    audioContextRef.current = context;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const lfo = context.createOscillator();
+    const lfoGain = context.createGain();
+    const isTobi = selectedCharacterId === "tobi";
+    const now = context.currentTime;
+
+    oscillator.type = isTobi ? "sine" : "triangle";
+    oscillator.frequency.setValueAtTime(isTobi ? 148 : 212, now);
+    lfo.type = "sine";
+    lfo.frequency.setValueAtTime(isTobi ? 1.55 : 2.15, now);
+    lfoGain.gain.setValueAtTime(isTobi ? 5 : 8, now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(isTobi ? 0.026 : 0.018, now + 0.14);
+
+    lfo.connect(lfoGain);
+    lfoGain.connect(oscillator.frequency);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    lfo.start();
+    void context.resume();
+
+    return () => {
+      const stopAt = context.currentTime + 0.12;
+      gain.gain.cancelScheduledValues(context.currentTime);
+      gain.gain.setTargetAtTime(0.0001, context.currentTime, 0.035);
+      oscillator.stop(stopAt);
+      lfo.stop(stopAt);
+    };
+  }, [isMuted, selectedCharacterId, status]);
+
+  useEffect(() => {
+    return () => {
+      void audioContextRef.current?.close();
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -293,6 +350,18 @@ export default function Home() {
               <span>FLIGHT</span>
               <strong>{score}</strong>
             </div>
+
+            <button
+              type="button"
+              className="sound-toggle"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={toggleMute}
+              aria-pressed={isMuted}
+              aria-label={isMuted ? "Turn cockpit sounds on" : "Mute cockpit sounds"}
+              title={isMuted ? "Turn cockpit sounds on" : "Mute cockpit sounds"}
+            >
+              {isMuted ? <VolumeX size={15} /> : <Volume2 size={15} />}
+            </button>
 
             {status === "playing" && (
               <button

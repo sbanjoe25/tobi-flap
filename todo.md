@@ -45,4 +45,7 @@
 - [x] Add gentle cockpit hover motion for both pilots.
 - [x] Stagger the pilot timing and respect reduced-motion preferences.
 - [x] Verify the hover motion remains subtle and does not conflict with flight movement.
+- [x] Add distinct synthesized hover sounds for Tobi and Liam during active flight.
+- [x] Add a persistent mute control and retain the user’s preference.
+- [x] Verify the audio starts and stops cleanly with flight state changes.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.
