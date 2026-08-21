@@ -84,4 +84,4 @@
 - [x] Extract deterministic game helpers and add unit tests for core game scenarios.
 - [x] Add a Makefile covering local install, development, checks, tests, and builds.
 - [x] Run the full validation suite and document local setup.
-- [ ] Create a private GitHub repository and push the completed project.
+- [x] Create a private GitHub repository and push the completed project.
