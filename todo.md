@@ -48,4 +48,8 @@
 - [x] Add distinct synthesized hover sounds for Tobi and Liam during active flight.
 - [x] Add a persistent mute control and retain the user’s preference.
 - [x] Verify the audio starts and stops cleanly with flight state changes.
+- [x] Start hover audio directly from the player’s flap action to satisfy browser audio policies.
+- [x] Make the hover effect visibly stronger during active flight.
+- [x] Add a clear visual engine-effect indicator while a cockpit is moving.
+- [x] Verify audio and motion feedback after an actual flight start.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.

@@ -14,6 +14,13 @@ type Pipe = {
   top: number;
 };
 
+type HoverAudioNodes = {
+  oscillator: OscillatorNode;
+  gain: GainNode;
+  lfo: OscillatorNode;
+  lfoGain: GainNode;
+};
+
 const STAGE_WIDTH = 360;
 const STAGE_HEIGHT = 640;
 const GROUND_HEIGHT = 56;
@@ -105,6 +112,7 @@ export default function Home() {
   const statusRef = useRef<GameStatus>("ready");
   const animationFrameRef = useRef<number | undefined>(undefined);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const hoverAudioRef = useRef<HoverAudioNodes | null>(null);
 
   const selectedCharacter = CHARACTERS.find((character) => character.id === selectedCharacterId) ?? CHARACTERS[0];
 
@@ -119,6 +127,71 @@ export default function Home() {
     if (storedBest) setBestScore(Number(storedBest) || 0);
     else setBestScore(0);
   }, [selectedCharacterId]);
+
+  const stopHoverAudio = useCallback(() => {
+    const nodes = hoverAudioRef.current;
+    const context = audioContextRef.current;
+    if (!nodes || !context) return;
+
+    const stopAt = context.currentTime + 0.12;
+    nodes.gain.gain.cancelScheduledValues(context.currentTime);
+    nodes.gain.gain.setTargetAtTime(0.0001, context.currentTime, 0.035);
+    nodes.oscillator.stop(stopAt);
+    nodes.lfo.stop(stopAt);
+    hoverAudioRef.current = null;
+  }, []);
+
+  const startHoverAudio = useCallback((pilotId: CharacterId) => {
+    if (isMuted || hoverAudioRef.current) return;
+
+    const AudioContextConstructor = window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextConstructor) return;
+
+    const context = audioContextRef.current ?? new AudioContextConstructor();
+    audioContextRef.current = context;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const lfo = context.createOscillator();
+    const lfoGain = context.createGain();
+    const isTobi = pilotId === "tobi";
+    const now = context.currentTime;
+
+    oscillator.type = isTobi ? "sine" : "triangle";
+    oscillator.frequency.setValueAtTime(isTobi ? 148 : 212, now);
+    lfo.type = "sine";
+    lfo.frequency.setValueAtTime(isTobi ? 1.55 : 2.15, now);
+    lfoGain.gain.setValueAtTime(isTobi ? 6 : 9, now);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(isTobi ? 0.052 : 0.04, now + 0.12);
+    lfo.connect(lfoGain);
+    lfoGain.connect(oscillator.frequency);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    lfo.start();
+    hoverAudioRef.current = { oscillator, gain, lfo, lfoGain };
+    void context.resume();
+  }, [isMuted]);
+
+  const playFlapChirp = useCallback((pilotId: CharacterId) => {
+    const context = audioContextRef.current;
+    if (isMuted || !context) return;
+
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const isTobi = pilotId === "tobi";
+    const now = context.currentTime;
+    oscillator.type = isTobi ? "sine" : "triangle";
+    oscillator.frequency.setValueAtTime(isTobi ? 320 : 410, now);
+    oscillator.frequency.exponentialRampToValueAtTime(isTobi ? 235 : 305, now + 0.12);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(isTobi ? 0.055 : 0.044, now + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start(now);
+    oscillator.stop(now + 0.15);
+  }, [isMuted]);
 
   const finishFlight = useCallback(() => {
     if (statusRef.current !== "playing") return;
@@ -146,6 +219,9 @@ export default function Home() {
   }, []);
 
   const flap = useCallback(() => {
+    startHoverAudio(selectedCharacterId);
+    playFlapChirp(selectedCharacterId);
+
     if (statusRef.current === "gameover") {
       resetFlight(true);
       gameRef.current.velocity = FLAP_VELOCITY;
@@ -160,7 +236,7 @@ export default function Home() {
 
     gameRef.current.velocity = FLAP_VELOCITY;
     setVelocity(FLAP_VELOCITY);
-  }, [resetFlight]);
+  }, [playFlapChirp, resetFlight, selectedCharacterId, startHoverAudio]);
 
   const chooseCharacter = useCallback((characterId: CharacterId) => {
     if (statusRef.current !== "ready") return;
@@ -176,55 +252,21 @@ export default function Home() {
     setIsMuted((previous) => {
       const next = !previous;
       window.localStorage.setItem("tobi-flap-muted", String(next));
+      if (next) stopHoverAudio();
       return next;
     });
-  }, []);
+  }, [stopHoverAudio]);
 
   useEffect(() => {
-    if (status !== "playing" || isMuted) return;
-
-    const AudioContextConstructor = window.AudioContext ?? (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioContextConstructor) return;
-
-    const context = audioContextRef.current ?? new AudioContextConstructor();
-    audioContextRef.current = context;
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    const lfo = context.createOscillator();
-    const lfoGain = context.createGain();
-    const isTobi = selectedCharacterId === "tobi";
-    const now = context.currentTime;
-
-    oscillator.type = isTobi ? "sine" : "triangle";
-    oscillator.frequency.setValueAtTime(isTobi ? 148 : 212, now);
-    lfo.type = "sine";
-    lfo.frequency.setValueAtTime(isTobi ? 1.55 : 2.15, now);
-    lfoGain.gain.setValueAtTime(isTobi ? 5 : 8, now);
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(isTobi ? 0.026 : 0.018, now + 0.14);
-
-    lfo.connect(lfoGain);
-    lfoGain.connect(oscillator.frequency);
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start();
-    lfo.start();
-    void context.resume();
-
-    return () => {
-      const stopAt = context.currentTime + 0.12;
-      gain.gain.cancelScheduledValues(context.currentTime);
-      gain.gain.setTargetAtTime(0.0001, context.currentTime, 0.035);
-      oscillator.stop(stopAt);
-      lfo.stop(stopAt);
-    };
-  }, [isMuted, selectedCharacterId, status]);
+    if (status !== "playing" || isMuted) stopHoverAudio();
+  }, [isMuted, status, stopHoverAudio]);
 
   useEffect(() => {
     return () => {
+      stopHoverAudio();
       void audioContextRef.current?.close();
     };
-  }, []);
+  }, [stopHoverAudio]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -384,6 +426,7 @@ export default function Home() {
               style={{ left: `${(CHARACTER_X / STAGE_WIDTH) * 100}%`, top: `${characterTop}%`, transform: `translate(-50%, -50%) rotate(${characterAngle}deg)` }}
               aria-hidden="true"
             >
+              <span className="engine-aura" />
               <div className={`cockpit-hover cockpit-hover--${selectedCharacter.id}`}>
                 <img src={selectedCharacter.image} alt="" />
               </div>
