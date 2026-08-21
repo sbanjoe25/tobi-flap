@@ -65,3 +65,6 @@
 - [x] Increase asteroid movement speed and spawn frequency as the score rises.
 - [x] Surface the current Asteroid Field difficulty tier during flight.
 - [x] Validate progressive scaling and save a delivery checkpoint.
+- [x] Prevent pre-flight backdrop taps from launching the game.
+- [x] Preserve tap and keyboard flapping once a flight has started.
+- [x] Validate launch-button-only behavior and save a delivery checkpoint.

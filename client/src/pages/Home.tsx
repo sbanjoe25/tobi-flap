@@ -284,11 +284,11 @@ export default function Home() {
     setScore(0);
   }, [gameMode]);
 
-  const flap = useCallback(() => {
-    startHoverAudio(selectedCharacterId);
-    playFlapChirp(selectedCharacterId);
-
+  const flap = useCallback((allowLaunch = false) => {
     if (statusRef.current === "gameover") {
+      if (!allowLaunch) return;
+      startHoverAudio(selectedCharacterId);
+      playFlapChirp(selectedCharacterId);
       resetFlight(true);
       gameRef.current.velocity = FLAP_VELOCITY;
       setVelocity(FLAP_VELOCITY);
@@ -296,10 +296,14 @@ export default function Home() {
     }
 
     if (statusRef.current === "ready") {
+      if (!allowLaunch) return;
       statusRef.current = "playing";
       setStatus("playing");
     }
 
+    if (statusRef.current !== "playing") return;
+    startHoverAudio(selectedCharacterId);
+    playFlapChirp(selectedCharacterId);
     gameRef.current.velocity = FLAP_VELOCITY;
     setVelocity(FLAP_VELOCITY);
   }, [playFlapChirp, resetFlight, selectedCharacterId, startHoverAudio]);
@@ -350,6 +354,7 @@ export default function Home() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.code === "Space" || event.code === "ArrowUp") {
+        if (statusRef.current !== "playing") return;
         event.preventDefault();
         flap();
       }
@@ -479,9 +484,9 @@ export default function Home() {
 
           <div
             className={`game-stage game-stage--${status} game-stage--${gameMode}`}
-            onPointerDown={flap}
+            onPointerDown={() => flap()}
             role="application"
-            aria-label={`Tobi Flap game. ${selectedCharacter.name} is selected. Press Space, Arrow Up, or tap to flap.`}
+            aria-label={status === "playing" ? `Tobi Flap game in flight. ${selectedCharacter.name} is selected. Press Space, Arrow Up, or tap to flap.` : `Tobi Flap game. ${selectedCharacter.name} is selected. Choose a pilot and activate the launch button to begin.`}
           >
             <div className="starfield starfield--far" aria-hidden="true" />
             <div className="starfield starfield--near" aria-hidden="true" />
@@ -560,7 +565,7 @@ export default function Home() {
                   </div>
                   <p className="overlay-kicker">READY FOR TAKEOFF?</p>
                   <h2>{gameMode === "asteroid" ? "Dodge the debris." : "Thread the starfield."}</h2>
-                  <p>Tap the sky or press <kbd>SPACE</kbd> to launch.</p>
+                  <p>Choose your pilot, then use the launch button.</p>
                   <div className="character-picker" aria-label="Choose a character">
                     <p>CHOOSE A PILOT</p>
                     <div className="character-picker__choices">
@@ -593,7 +598,7 @@ export default function Home() {
                       </button>
                     </div>
                   </div>
-                  <Button className="launch-button" onPointerDown={(event) => event.stopPropagation()} onClick={flap}>
+                  <Button className="launch-button" onPointerDown={(event) => event.stopPropagation()} onClick={() => flap(true)}>
                     <ArrowUp size={18} />
                     {gameMode === "asteroid" ? "Launch Asteroid Field" : `Fly with ${selectedCharacter.name}`}
                   </Button>
@@ -615,7 +620,7 @@ export default function Home() {
                     <strong>{bestScore}</strong>
                   </div>
                   <div className="landing-actions">
-                    <Button className="launch-button" onPointerDown={(event) => event.stopPropagation()} onClick={flap}>
+                    <Button className="launch-button" onPointerDown={(event) => event.stopPropagation()} onClick={() => flap(true)}>
                       <RotateCcw size={17} />
                       Fly again
                     </Button>
@@ -631,7 +636,7 @@ export default function Home() {
 
           <footer className="cabinet-footer">
             <span className="cabinet-footer__dot" />
-            <p>Tap, click, or press <kbd>SPACE</kbd> to boost.</p>
+            <p>{status === "playing" ? <>Tap, click, or press <kbd>SPACE</kbd> to boost.</> : "Use the launch button to take off."}</p>
             <span className="cabinet-footer__dots" aria-hidden="true"><i /><i /><i /></span>
           </footer>
         </div>
@@ -646,15 +651,15 @@ export default function Home() {
             <div className="how-to-play">
               <div className="how-to-play__step">
                 <span className="step-number">01</span>
-                <div><strong>Flap</strong><small>Tap the game or hit Space.</small></div>
+                <div><strong>Launch</strong><small>Choose a pilot, then use launch.</small></div>
               </div>
               <div className="how-to-play__step">
                 <span className="step-number">02</span>
-                <div><strong>Glide</strong><small>Let gravity carry you through.</small></div>
+                <div><strong>Flap</strong><small>In flight, tap the game or hit Space.</small></div>
               </div>
               <div className="how-to-play__step">
                 <span className="step-number">03</span>
-                <div><strong>Navigate</strong><small>Pass cosmic gates to set a best flight.</small></div>
+                <div><strong>Glide</strong><small>Let gravity carry you through.</small></div>
               </div>
             </div>
 
