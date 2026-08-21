@@ -33,4 +33,6 @@
 - [x] Remove remaining light halo or background artifacts from Tobi’s spacecraft cut-out.
 - [x] Match Tobi’s cockpit interior glow to Liam’s pink interior color.
 - [x] Verify the refined Tobi cockpit in the selector and flight view.
+- [x] Remove the remaining white edge fringe from Tobi’s cockpit sprite.
+- [x] Verify the Tobi spacecraft edge is clean against the sky background.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.

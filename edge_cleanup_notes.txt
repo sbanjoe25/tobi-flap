@@ -1,0 +1,4 @@
+Tobi cockpit cleanup findings:
+- The generated sprite retained a pale neutral/cream halo connected to the transparent exterior.
+- The cleanup script now removes connected neutral background pixels and repeats edge erosion to clear the remaining fringe.
+- The preserved cockpit colors are saturated peach, orange, green, and pink; the removal targets only low-saturation pale pixels at the transparent boundary.
