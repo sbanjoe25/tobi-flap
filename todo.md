@@ -13,4 +13,7 @@
 - [x] Create recognizable spaceship-pilot treatments for Tobi and Liam.
 - [x] Apply the pilot visual system to character cards, active flight, and landing state.
 - [x] Validate menu return and spaceship pilot presentation.
+- [x] Generate a clean, high-prominence Liam face cut-out with no background artifacts.
+- [x] Integrate Liam’s refined face cleanly into the same cockpit treatment as Tobi.
+- [x] Validate Liam’s card, pilot badge, and in-flight cockpit presentation.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.

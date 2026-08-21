@@ -40,7 +40,7 @@ const CHARACTERS: Array<{ id: CharacterId; name: string; image: string; note: st
   {
     id: "liam",
     name: "Liam",
-    image: "/manus-storage/tobi-flap-liam-original_282f8d3f.jpeg",
+    image: "/manus-storage/tobi-flap-liam-cockpit-cutout_8fd6ac54.png",
     note: "Wide-eyed wonder",
   },
 ];
