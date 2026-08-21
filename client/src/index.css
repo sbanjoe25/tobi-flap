@@ -148,12 +148,8 @@
 .pipe__leaf--two { left: -6px; bottom: 36px; transform: rotate(144deg); }
 .pipe__leaf--three { right: -8px; top: 25px; transform: rotate(-35deg); }
 
-.photo-flier { position: absolute; z-index: 6; width: calc((64 / 360) * 100%); aspect-ratio: 1; transition: transform 75ms linear; }
-.photo-flier__halo { position: absolute; inset: -7px; border: 2px solid rgba(22, 55, 74, .24); border-radius: 50%; background: #fff7d9; box-shadow: 0 5px 0 rgba(22, 55, 74, .21); }
-.photo-flier img { position: relative; display: block; width: 100%; height: 100%; border: 3px solid #16374a; border-radius: 50%; object-fit: cover; object-position: 50% 34%; background: #fffaf0; }
-.photo-flier__antenna { position: absolute; z-index: -1; top: -10px; width: 8px; height: 20px; border: 2px solid #16374a; border-bottom: 0; border-radius: 90% 90% 0 0; background: #a8d951; transform-origin: bottom center; }
-.photo-flier__antenna--left { left: 12px; transform: rotate(-24deg); }
-.photo-flier__antenna--right { right: 12px; transform: rotate(24deg); }
+.photo-flier { position: absolute; z-index: 6; width: calc((82 / 360) * 100%); aspect-ratio: 1; transition: transform 75ms linear; }
+.photo-flier img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 3px rgba(22, 55, 74, .22)); }
 
 .orchard-ground { position: absolute; z-index: 7; right: 0; bottom: 0; left: 0; height: calc((56 / 640) * 100%); overflow: hidden; border-top: 3px solid #16374a; background: #f5c166; }
 .orchard-ground__stripe { position: absolute; top: 0; right: 0; left: 0; height: 9px; border-bottom: 2px solid #16374a; background: #a8d951; }
@@ -162,11 +158,8 @@
 .game-overlay { position: absolute; z-index: 10; inset: 0; display: grid; place-items: center; padding: 22px; background: rgba(22, 55, 74, .14); }
 .game-overlay__card { width: min(100%, 282px); padding: 26px 21px 20px; border: 3px solid #16374a; border-radius: 22px; background: #fffaf0; text-align: center; box-shadow: 7px 8px 0 #16374a; animation: overlay-enter .24s cubic-bezier(.23, 1, .32, 1); }
 .pilot-badge { display: inline-flex; align-items: center; gap: 9px; margin-bottom: 8px; padding: 4px 9px 4px 5px; border: 2px solid #16374a; border-radius: 999px; background: #fff0d3; box-shadow: 2px 2px 0 rgba(22, 55, 74, .18); text-align: left; }
-.pilot-badge__portrait { position: relative; width: 38px; height: 38px; }
-.pilot-badge__portrait img { display: block; width: 100%; height: 100%; border: 2px solid #16374a; border-radius: 50%; object-fit: cover; object-position: 50% 34%; background: #fffaf0; }
-.pilot-badge__antenna { position: absolute; z-index: -1; top: -5px; width: 5px; height: 11px; border: 1.5px solid #16374a; border-bottom: 0; border-radius: 99px 99px 0 0; background: #a8d951; }
-.pilot-badge__antenna--left { left: 7px; transform: rotate(-28deg); }
-.pilot-badge__antenna--right { right: 7px; transform: rotate(28deg); }
+.pilot-badge__portrait { width: 45px; height: 45px; margin: -7px 0 -6px -4px; }
+.pilot-badge__portrait img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 1px rgba(22, 55, 74, .25)); }
 .pilot-badge span { display: block; color: #718d26; font-size: 8px; font-weight: 900; letter-spacing: .11em; }
 .pilot-badge strong { display: block; color: #16374a; font-size: 12px; font-weight: 900; line-height: 1.1; }
 .overlay-kicker { margin: 12px 0 2px; color: #718d26; font-size: 9px; font-weight: 900; letter-spacing: .15em; }

@@ -16,23 +16,23 @@ type Pipe = {
 const STAGE_WIDTH = 360;
 const STAGE_HEIGHT = 640;
 const GROUND_HEIGHT = 56;
-const CHARACTER_SIZE = 64;
+const CHARACTER_SIZE = 58;
 const CHARACTER_X = 98;
 const PIPE_WIDTH = 76;
-const PIPE_GAP = 176;
-const GRAVITY = 980;
-const FLAP_VELOCITY = -350;
-const PIPE_SPEED = 142;
-const PIPE_INTERVAL = 1.55;
+const PIPE_GAP = 224;
+const GRAVITY = 900;
+const FLAP_VELOCITY = -325;
+const PIPE_SPEED = 126;
+const PIPE_INTERVAL = 1.7;
 
 const skyImage = "/manus-storage/photo-flap-orchard-sky_522434be.png";
 const horizonImage = "/manus-storage/photo-flap-orchard-horizon_6cafdd03.png";
 const logoImage = "/manus-storage/photo-flap-alien-logo_ea409bed.png";
-const characterImage = "/manus-storage/photo-flap-character_a00ccc66.jpeg";
+const characterImage = "/manus-storage/photo-flap-face-sprite_bcdd7b18.png";
 
 const randomPipe = (id: number, x = STAGE_WIDTH + 30): Pipe => {
-  const minTop = 114;
-  const maxTop = STAGE_HEIGHT - GROUND_HEIGHT - PIPE_GAP - 126;
+  const minTop = 96;
+  const maxTop = STAGE_HEIGHT - GROUND_HEIGHT - PIPE_GAP - 96;
 
   return {
     id,
@@ -267,10 +267,7 @@ export default function Home() {
               style={{ left: `${(CHARACTER_X / STAGE_WIDTH) * 100}%`, top: `${characterTop}%`, transform: `translate(-50%, -50%) rotate(${characterAngle}deg)` }}
               aria-hidden="true"
             >
-              <div className="photo-flier__halo" />
               <img src={characterImage} alt="" />
-              <span className="photo-flier__antenna photo-flier__antenna--left" />
-              <span className="photo-flier__antenna photo-flier__antenna--right" />
             </div>
 
             <div className="orchard-ground">
@@ -282,7 +279,7 @@ export default function Home() {
               <div className="game-overlay game-overlay--start">
               <div className="game-overlay__card">
                   <div className="pilot-badge">
-                    <div className="pilot-badge__portrait"><img src={characterImage} alt="" /><span className="pilot-badge__antenna pilot-badge__antenna--left" /><span className="pilot-badge__antenna pilot-badge__antenna--right" /></div>
+                    <div className="pilot-badge__portrait"><img src={characterImage} alt="" /></div>
                     <div><span>YOUR PILOT</span><strong>Ready to flap</strong></div>
                   </div>
                   <p className="overlay-kicker">READY FOR TAKEOFF?</p>
