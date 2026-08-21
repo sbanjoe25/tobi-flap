@@ -6,6 +6,7 @@ import { ArrowUp, RotateCcw, Trophy } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type GameStatus = "ready" | "playing" | "gameover";
+type CharacterId = "tobi" | "liam";
 
 type Pipe = {
   id: number;
@@ -28,7 +29,21 @@ const PIPE_INTERVAL = 1.7;
 const skyImage = "/manus-storage/photo-flap-orchard-sky_522434be.png";
 const horizonImage = "/manus-storage/photo-flap-orchard-horizon_6cafdd03.png";
 const logoImage = "/manus-storage/photo-flap-alien-logo_ea409bed.png";
-const characterImage = "/manus-storage/photo-flap-face-cutout_38daf8a2.png";
+
+const CHARACTERS: Array<{ id: CharacterId; name: string; image: string; note: string }> = [
+  {
+    id: "tobi",
+    name: "Tobi",
+    image: "/manus-storage/photo-flap-face-cutout_38daf8a2.png",
+    note: "Orchard original",
+  },
+  {
+    id: "liam",
+    name: "Liam",
+    image: "/manus-storage/tobi-flap-liam-original_282f8d3f.jpeg",
+    note: "Wide-eyed wonder",
+  },
+];
 
 const randomPipe = (id: number, x = STAGE_WIDTH + 30): Pipe => {
   const minTop = 96;
@@ -84,14 +99,23 @@ export default function Home() {
   const [pipes, setPipes] = useState<Pipe[]>(() => getInitialGame().pipes);
   const [score, setScore] = useState(0);
   const [bestScore, setBestScore] = useState(0);
+  const [selectedCharacterId, setSelectedCharacterId] = useState<CharacterId>("tobi");
   const gameRef = useRef(getInitialGame());
   const statusRef = useRef<GameStatus>("ready");
   const animationFrameRef = useRef<number | undefined>(undefined);
 
+  const selectedCharacter = CHARACTERS.find((character) => character.id === selectedCharacterId) ?? CHARACTERS[0];
+
   useEffect(() => {
-    const storedBest = window.localStorage.getItem("photo-flap-best");
-    if (storedBest) setBestScore(Number(storedBest) || 0);
+    const storedCharacter = window.localStorage.getItem("tobi-flap-character") as CharacterId | null;
+    if (storedCharacter === "tobi" || storedCharacter === "liam") setSelectedCharacterId(storedCharacter);
   }, []);
+
+  useEffect(() => {
+    const storedBest = window.localStorage.getItem(`tobi-flap-best-${selectedCharacterId}`);
+    if (storedBest) setBestScore(Number(storedBest) || 0);
+    else setBestScore(0);
+  }, [selectedCharacterId]);
 
   const finishFlight = useCallback(() => {
     if (statusRef.current !== "playing") return;
@@ -102,10 +126,10 @@ export default function Home() {
     const finalScore = gameRef.current.score;
     setBestScore((previousBest) => {
       const nextBest = Math.max(previousBest, finalScore);
-      window.localStorage.setItem("photo-flap-best", String(nextBest));
+      window.localStorage.setItem(`tobi-flap-best-${selectedCharacterId}`, String(nextBest));
       return nextBest;
     });
-  }, []);
+  }, [selectedCharacterId]);
 
   const resetFlight = useCallback((begin = false) => {
     const nextGame = getInitialGame();
@@ -134,6 +158,12 @@ export default function Home() {
     gameRef.current.velocity = FLAP_VELOCITY;
     setVelocity(FLAP_VELOCITY);
   }, [resetFlight]);
+
+  const chooseCharacter = useCallback((characterId: CharacterId) => {
+    if (statusRef.current !== "ready") return;
+    setSelectedCharacterId(characterId);
+    window.localStorage.setItem("tobi-flap-character", characterId);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -244,7 +274,7 @@ export default function Home() {
             className={`game-stage game-stage--${status}`}
             onPointerDown={flap}
             role="application"
-            aria-label="Tobi Flap game. Press Space, Arrow Up, or tap to flap."
+            aria-label={`Tobi Flap game. ${selectedCharacter.name} is selected. Press Space, Arrow Up, or tap to flap.`}
           >
             <div className="game-stage__sky" style={{ backgroundImage: `url(${skyImage})` }} />
             <div className="game-stage__grain" />
@@ -263,11 +293,11 @@ export default function Home() {
             ))}
 
             <div
-              className="photo-flier"
+              className={`photo-flier photo-flier--${selectedCharacter.id}`}
               style={{ left: `${(CHARACTER_X / STAGE_WIDTH) * 100}%`, top: `${characterTop}%`, transform: `translate(-50%, -50%) rotate(${characterAngle}deg)` }}
               aria-hidden="true"
             >
-              <img src={characterImage} alt="" />
+              <img src={selectedCharacter.image} alt="" />
             </div>
 
             <div className="orchard-ground">
@@ -279,15 +309,36 @@ export default function Home() {
               <div className="game-overlay game-overlay--start">
               <div className="game-overlay__card">
                   <div className="pilot-badge">
-                    <div className="pilot-badge__portrait"><img src={characterImage} alt="" /></div>
-                    <div><span>YOUR PILOT</span><strong>Ready to flap</strong></div>
+                    <div className={`pilot-badge__portrait pilot-badge__portrait--${selectedCharacter.id}`}><img src={selectedCharacter.image} alt="" /></div>
+                    <div><span>YOUR PILOT</span><strong>{selectedCharacter.name} is ready</strong></div>
                   </div>
                   <p className="overlay-kicker">READY FOR TAKEOFF?</p>
                   <h2>Thread the orchard.</h2>
                   <p>Tap the sky or press <kbd>SPACE</kbd> to launch.</p>
+                  <div className="character-picker" aria-label="Choose a character">
+                    <p>CHOOSE A PILOT</p>
+                    <div className="character-picker__choices">
+                      {CHARACTERS.map((character) => {
+                        const isSelected = character.id === selectedCharacter.id;
+                        return (
+                          <button
+                            key={character.id}
+                            type="button"
+                            className={`character-choice character-choice--${character.id} ${isSelected ? "is-selected" : ""}`}
+                            onPointerDown={(event) => event.stopPropagation()}
+                            onClick={() => chooseCharacter(character.id)}
+                            aria-pressed={isSelected}
+                          >
+                            <span className="character-choice__portrait"><img src={character.image} alt="" /></span>
+                            <span><strong>{character.name}</strong><small>{character.note}</small></span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                   <Button className="launch-button" onPointerDown={(event) => event.stopPropagation()} onClick={flap}>
                     <ArrowUp size={18} />
-                    Start flight
+                    Fly with {selectedCharacter.name}
                   </Button>
                 </div>
               </div>
@@ -297,13 +348,13 @@ export default function Home() {
               <div className="game-overlay game-overlay--over">
                 <div className="game-overlay__card game-overlay__card--over">
                   <p className="overlay-kicker">ORCHARD LANDING</p>
-                  <h2>Nice flight!</h2>
+                  <h2>{selectedCharacter.name}'s flight!</h2>
                   <div className="result-row">
                     <span>THIS FLIGHT</span>
                     <strong>{score}</strong>
                   </div>
                   <div className="result-row result-row--best">
-                    <span>BEST FLIGHT</span>
+                    <span>{selectedCharacter.name.toUpperCase()}’S BEST</span>
                     <strong>{bestScore}</strong>
                   </div>
                   <Button className="launch-button" onPointerDown={(event) => event.stopPropagation()} onClick={flap}>

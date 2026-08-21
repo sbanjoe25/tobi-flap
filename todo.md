@@ -3,4 +3,8 @@
 - [x] Replace the circular player frame and pilot badge portrait with the new cut-out asset.
 - [x] Verify the revised character sprite presents without an opaque rectangular or circular frame.
 - [x] Rename all visible game and browser-brand references to Tobi Flap.
+- [x] Create a clean face-shaped Liam character asset from the supplied photo.
+- [x] Add Tobi and Liam to the character selection interface.
+- [x] Use the selected character in the flight screen, pre-flight card, and score copy.
+- [x] Validate the selector and selected-character presentation.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.
