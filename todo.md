@@ -61,3 +61,7 @@
 - [x] Tune Asteroid Field for a faster, score-focused flight challenge.
 - [x] Validate the challenge mode controls and obstacle presentation.
 - [x] Validate the updated responsive interface and save a delivery checkpoint.
+- [x] Define fair score milestones for Asteroid Field difficulty escalation.
+- [x] Increase asteroid movement speed and spawn frequency as the score rises.
+- [x] Surface the current Asteroid Field difficulty tier during flight.
+- [x] Validate progressive scaling and save a delivery checkpoint.

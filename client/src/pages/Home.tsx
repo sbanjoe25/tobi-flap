@@ -42,8 +42,12 @@ const GRAVITY = 900;
 const FLAP_VELOCITY = -325;
 const PIPE_SPEED = 126;
 const PIPE_INTERVAL = 1.7;
-const ASTEROID_SPEED = 192;
-const ASTEROID_INTERVAL = 0.92;
+const ASTEROID_DIFFICULTY_TIERS = [
+  { minimumScore: 0, level: 1, label: "SCOUT", speed: 192, interval: 0.92 },
+  { minimumScore: 4, level: 2, label: "RUSH", speed: 218, interval: 0.84 },
+  { minimumScore: 8, level: 3, label: "SURGE", speed: 244, interval: 0.76 },
+  { minimumScore: 12, level: 4, label: "NOVA", speed: 270, interval: 0.68 },
+] as const;
 
 const logoImage = "/manus-storage/photo-flap-alien-logo_ea409bed.png";
 
@@ -83,6 +87,9 @@ const randomAsteroid = (id: number, x = STAGE_WIDTH + 28): Asteroid => {
     spin: 5.5 + Math.random() * 3.5,
   };
 };
+
+const getAsteroidDifficulty = (currentScore: number) =>
+  [...ASTEROID_DIFFICULTY_TIERS].reverse().find((tier) => currentScore >= tier.minimumScore) ?? ASTEROID_DIFFICULTY_TIERS[0];
 
 function getInitialGame(mode: GameMode = "normal") {
   return {
@@ -159,6 +166,7 @@ export default function Home() {
   const hoverAudioRef = useRef<HoverAudioNodes | null>(null);
 
   const selectedCharacter = CHARACTERS.find((character) => character.id === selectedCharacterId) ?? CHARACTERS[0];
+  const asteroidDifficulty = getAsteroidDifficulty(score);
 
   useEffect(() => {
     const storedCharacter = window.localStorage.getItem("tobi-flap-character") as CharacterId | null;
@@ -365,7 +373,8 @@ export default function Home() {
         game.spawnClock += deltaTime;
 
         const isAsteroidMode = gameMode === "asteroid";
-        const spawnInterval = isAsteroidMode ? ASTEROID_INTERVAL : PIPE_INTERVAL;
+        const currentAsteroidDifficulty = getAsteroidDifficulty(game.score);
+        const spawnInterval = isAsteroidMode ? currentAsteroidDifficulty.interval : PIPE_INTERVAL;
 
         if (game.spawnClock >= spawnInterval) {
           game.spawnClock = 0;
@@ -378,7 +387,7 @@ export default function Home() {
           .map((pipe) => ({ ...pipe, x: pipe.x - PIPE_SPEED * deltaTime }))
           .filter((pipe) => pipe.x > -PIPE_WIDTH - 4);
         game.asteroids = game.asteroids
-          .map((asteroid) => ({ ...asteroid, x: asteroid.x - ASTEROID_SPEED * deltaTime }))
+          .map((asteroid) => ({ ...asteroid, x: asteroid.x - currentAsteroidDifficulty.speed * deltaTime }))
           .filter((asteroid) => asteroid.x > -asteroid.size - 4);
 
         const playerLeft = CHARACTER_X - CHARACTER_SIZE / 2;
@@ -487,6 +496,13 @@ export default function Home() {
               <span>FLIGHT</span>
               <strong>{score}</strong>
             </div>
+            {gameMode === "asteroid" && (
+              <div className={`threat-pill threat-pill--${asteroidDifficulty.level}`} aria-live="polite" aria-label={`Asteroid Field threat level ${asteroidDifficulty.level}: ${asteroidDifficulty.label}`}>
+                <span>THREAT</span>
+                <strong>LV {asteroidDifficulty.level}</strong>
+                <small>{asteroidDifficulty.label}</small>
+              </div>
+            )}
 
             <button
               type="button"
@@ -573,7 +589,7 @@ export default function Home() {
                         <span className="mode-choice__glyph">✦</span><span><strong>Cosmic Gates</strong><small>Balanced flight</small></span>
                       </button>
                       <button type="button" className={`mode-choice mode-choice--asteroid ${gameMode === "asteroid" ? "is-selected" : ""}`} onPointerDown={(event) => event.stopPropagation()} onClick={() => chooseMode("asteroid")} aria-pressed={gameMode === "asteroid"}>
-                        <span className="mode-choice__glyph">☄</span><span><strong>Asteroid Field</strong><small>Fast debris dodge</small></span>
+                        <span className="mode-choice__glyph">☄</span><span><strong>Asteroid Field</strong><small>Ramps / 4 pts</small></span>
                       </button>
                     </div>
                   </div>
