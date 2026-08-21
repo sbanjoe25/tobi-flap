@@ -28,7 +28,7 @@ const PIPE_INTERVAL = 1.7;
 const skyImage = "/manus-storage/photo-flap-orchard-sky_522434be.png";
 const horizonImage = "/manus-storage/photo-flap-orchard-horizon_6cafdd03.png";
 const logoImage = "/manus-storage/photo-flap-alien-logo_ea409bed.png";
-const characterImage = "/manus-storage/photo-flap-face-sprite_bcdd7b18.png";
+const characterImage = "/manus-storage/photo-flap-face-cutout_38daf8a2.png";
 
 const randomPipe = (id: number, x = STAGE_WIDTH + 30): Pipe => {
   const minTop = 96;

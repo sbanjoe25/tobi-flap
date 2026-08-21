@@ -149,7 +149,7 @@
 .pipe__leaf--three { right: -8px; top: 25px; transform: rotate(-35deg); }
 
 .photo-flier { position: absolute; z-index: 6; width: calc((82 / 360) * 100%); aspect-ratio: 1; transition: transform 75ms linear; }
-.photo-flier img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 6px 3px rgba(22, 55, 74, .22)); }
+.photo-flier img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; clip-path: polygon(50% 1%, 66% 5%, 80% 16%, 88% 34%, 87% 58%, 78% 79%, 65% 94%, 50% 100%, 35% 94%, 22% 79%, 13% 58%, 12% 34%, 20% 16%, 34% 5%); filter: drop-shadow(0 6px 3px rgba(22, 55, 74, .22)); }
 
 .orchard-ground { position: absolute; z-index: 7; right: 0; bottom: 0; left: 0; height: calc((56 / 640) * 100%); overflow: hidden; border-top: 3px solid #16374a; background: #f5c166; }
 .orchard-ground__stripe { position: absolute; top: 0; right: 0; left: 0; height: 9px; border-bottom: 2px solid #16374a; background: #a8d951; }
@@ -159,7 +159,7 @@
 .game-overlay__card { width: min(100%, 282px); padding: 26px 21px 20px; border: 3px solid #16374a; border-radius: 22px; background: #fffaf0; text-align: center; box-shadow: 7px 8px 0 #16374a; animation: overlay-enter .24s cubic-bezier(.23, 1, .32, 1); }
 .pilot-badge { display: inline-flex; align-items: center; gap: 9px; margin-bottom: 8px; padding: 4px 9px 4px 5px; border: 2px solid #16374a; border-radius: 999px; background: #fff0d3; box-shadow: 2px 2px 0 rgba(22, 55, 74, .18); text-align: left; }
 .pilot-badge__portrait { width: 45px; height: 45px; margin: -7px 0 -6px -4px; }
-.pilot-badge__portrait img { display: block; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 1px rgba(22, 55, 74, .25)); }
+.pilot-badge__portrait img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; clip-path: polygon(50% 1%, 66% 5%, 80% 16%, 88% 34%, 87% 58%, 78% 79%, 65% 94%, 50% 100%, 35% 94%, 22% 79%, 13% 58%, 12% 34%, 20% 16%, 34% 5%); filter: drop-shadow(0 2px 1px rgba(22, 55, 74, .25)); }
 .pilot-badge span { display: block; color: #718d26; font-size: 8px; font-weight: 900; letter-spacing: .11em; }
 .pilot-badge strong { display: block; color: #16374a; font-size: 12px; font-weight: 900; line-height: 1.1; }
 .overlay-kicker { margin: 12px 0 2px; color: #718d26; font-size: 9px; font-weight: 900; letter-spacing: .15em; }

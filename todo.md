@@ -1,5 +1,5 @@
 - [x] Generate a transparent face-shaped cut-out from the supplied photo while preserving facial identity.
 - [x] Widen the obstacle gap and soften the flight pacing for a more forgiving game.
 - [x] Replace the circular player frame and pilot badge portrait with the new cut-out asset.
-- [ ] Verify the revised character sprite has no opaque background or framing.
+- [x] Verify the revised character sprite presents without an opaque rectangular or circular frame.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.
