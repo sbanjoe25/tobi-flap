@@ -40,4 +40,6 @@
 - [x] Add layered starfield planes behind the orchard sky.
 - [x] Add gentle parallax motion with reduced-motion support.
 - [x] Verify the starfield remains subtle and does not obscure gameplay.
+- [x] Match Tobi’s cockpit shadow softness and depth to Liam’s treatment.
+- [x] Verify the two pilot shadows have consistent visual quality.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.
