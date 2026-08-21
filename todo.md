@@ -30,4 +30,7 @@
 - [x] Remove the visible white background box from Tobi’s cockpit sprite.
 - [x] Verify the Tobi sprite edge is transparent in the selector and flight view.
 - [x] Mask the remaining Tobi image rectangle to the cockpit silhouette in the interface.
+- [x] Remove remaining light halo or background artifacts from Tobi’s spacecraft cut-out.
+- [x] Match Tobi’s cockpit interior glow to Liam’s pink interior color.
+- [x] Verify the refined Tobi cockpit in the selector and flight view.
 - [ ] Validate the updated responsive interface and save a delivery checkpoint.

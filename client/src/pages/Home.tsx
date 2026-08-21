@@ -34,7 +34,7 @@ const CHARACTERS: Array<{ id: CharacterId; name: string; image: string; note: st
   {
     id: "tobi",
     name: "Tobi",
-    image: "/manus-storage/tobi-flap-tobi-exact-liam-cockpit-transparent_357e1401.png",
+    image: "/manus-storage/tobi-flap-tobi-cockpit-pink-clean_a31c5343.png",
     note: "Orchard original",
   },
   {
