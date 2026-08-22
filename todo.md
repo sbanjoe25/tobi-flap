@@ -111,3 +111,6 @@
 - [x] Verify the repository-path deployment and save a delivery checkpoint.
 - [x] Route the GitHub Pages home path explicitly to the game component.
 - [x] Verify the live /tobi-flap/ page renders the game after redeployment.
+- [x] Define the preloaded game-media set and progress behavior.
+- [x] Add a Space Arcade loading screen with accessible progress feedback.
+- [x] Validate loading behavior for managed preview and GitHub Pages builds.

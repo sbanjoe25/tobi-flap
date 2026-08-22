@@ -54,6 +54,8 @@ const CHARACTERS: Array<{ id: CharacterId; name: string; image: string; note: st
     note: "Comet copilot",
   },
 ];
+const PRELOAD_IMAGE_ASSETS = [logoImage, ...CHARACTERS.map((character) => character.image)];
+const PRELOAD_ASSET_TOTAL = PRELOAD_IMAGE_ASSETS.length + 1;
 
 const randomPipe = (id: number, x = STAGE_WIDTH + 30): Pipe => {
   const minTop = 96;
@@ -135,6 +137,34 @@ function AsteroidDebris({ asteroid }: { asteroid: Asteroid }) {
   );
 }
 
+function LoadingScreen({ loadedAssetCount, failedAssetCount }: { loadedAssetCount: number; failedAssetCount: number }) {
+  const progress = Math.round((loadedAssetCount / PRELOAD_ASSET_TOTAL) * 100);
+  const loadingCopy = progress < 100 ? "Downloading pilot systems and soundtrack…" : failedAssetCount ? "Launching with the available systems." : "Cockpit link established.";
+
+  return (
+    <main className="loading-screen" aria-busy="true" aria-labelledby="loading-title">
+      <div className="loading-screen__stars" aria-hidden="true" />
+      <section className="loading-card" role="status" aria-live="polite">
+        <div className="loading-card__emblem" aria-hidden="true">
+          <img src={logoImage} alt="" />
+          <span><i /><i /><i /></span>
+        </div>
+        <p className="loading-card__eyebrow">SPACE ARCADE · LAUNCH SEQUENCE</p>
+        <h1 id="loading-title">Warming the cockpit.</h1>
+        <p className="loading-card__copy">{loadingCopy}</p>
+        <div className="loading-meter" role="progressbar" aria-label="Game media loading progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}>
+          <span className="loading-meter__fill" style={{ width: `${progress}%` }} />
+        </div>
+        <div className="loading-card__readout">
+          <span>{loadedAssetCount} / {PRELOAD_ASSET_TOTAL} ASSETS READY</span>
+          <strong>{progress}%</strong>
+        </div>
+        {failedAssetCount > 0 && <p className="loading-card__fallback">{failedAssetCount} asset{failedAssetCount === 1 ? "" : "s"} could not be preloaded.</p>}
+      </section>
+    </main>
+  );
+}
+
 export default function Home() {
   const [status, setStatus] = useState<GameStatus>("ready");
   const [y, setY] = useState(276);
@@ -150,6 +180,9 @@ export default function Home() {
   const [effectsVolume, setEffectsVolume] = useState(80);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [asteroids, setAsteroids] = useState<Asteroid[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadedAssetCount, setLoadedAssetCount] = useState(0);
+  const [failedAssetCount, setFailedAssetCount] = useState(0);
   const gameRef = useRef(getInitialGame());
   const statusRef = useRef<GameStatus>("ready");
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -172,6 +205,64 @@ export default function Home() {
     const storedEffectsVolume = window.localStorage.getItem("tobi-flap-effects-volume");
     if (storedMusicVolume !== null && Number.isFinite(Number(storedMusicVolume))) setMusicVolume(clampVolume(Number(storedMusicVolume)));
     if (storedEffectsVolume !== null && Number.isFinite(Number(storedEffectsVolume))) setEffectsVolume(clampVolume(Number(storedEffectsVolume)));
+  }, []);
+
+  useEffect(() => {
+    let completed = 0;
+    let cancelled = false;
+    let releaseTimer: number | undefined;
+    const startedAt = performance.now();
+    const minimumVisibleDuration = 360;
+
+    const settle = (failed = false) => {
+      if (cancelled || completed >= PRELOAD_ASSET_TOTAL) return;
+      completed += 1;
+      setLoadedAssetCount(completed);
+      if (failed) setFailedAssetCount((previous) => previous + 1);
+
+      if (completed === PRELOAD_ASSET_TOTAL) {
+        const remainingDuration = Math.max(0, minimumVisibleDuration - (performance.now() - startedAt));
+        releaseTimer = window.setTimeout(() => setIsLoading(false), remainingDuration);
+      }
+    };
+
+    const images = PRELOAD_IMAGE_ASSETS.map((source) => {
+      const image = new Image();
+      image.onload = () => settle();
+      image.onerror = () => settle(true);
+      image.src = source;
+      return image;
+    });
+
+    const soundtrack = new Audio();
+    let soundtrackSettled = false;
+    const settleSoundtrack = (failed = false) => {
+      if (soundtrackSettled) return;
+      soundtrackSettled = true;
+      settle(failed);
+    };
+    soundtrack.preload = "auto";
+    soundtrack.addEventListener("canplaythrough", () => settleSoundtrack(), { once: true });
+    soundtrack.addEventListener("error", () => settleSoundtrack(true), { once: true });
+    soundtrack.src = soundtrackUrl;
+    soundtrack.load();
+
+    const failSafe = window.setTimeout(() => {
+      while (completed < PRELOAD_ASSET_TOTAL) settle(true);
+    }, 12000);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(failSafe);
+      if (releaseTimer) window.clearTimeout(releaseTimer);
+      images.forEach((image) => {
+        image.onload = null;
+        image.onerror = null;
+      });
+      soundtrack.pause();
+      soundtrack.removeAttribute("src");
+      soundtrack.load();
+    };
   }, []);
 
   useEffect(() => {
@@ -604,6 +695,8 @@ export default function Home() {
 
   const characterAngle = Math.max(-20, Math.min(70, velocity * 0.09));
   const characterTop = (y / STAGE_HEIGHT) * 100;
+
+  if (isLoading) return <LoadingScreen loadedAssetCount={loadedAssetCount} failedAssetCount={failedAssetCount} />;
 
   return (
     <main className="orchard-app">
