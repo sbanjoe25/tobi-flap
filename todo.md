@@ -99,4 +99,4 @@
 - [x] Push the Pages workflow to the public GitHub repository.
 - [x] Configure Vite for the GitHub Pages repository subpath.
 - [x] Validate generated production asset URLs under the Pages base path.
-- [ ] Push the corrected Vite configuration to GitHub.
+- [x] Push the corrected Vite configuration to GitHub.
