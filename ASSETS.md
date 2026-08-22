@@ -4,6 +4,7 @@ The original pilot art and the Space Arcade soundtrack are published in the publ
 
 | Asset | Download | SHA-256 |
 | --- | --- | --- |
+| Space Arcade logo | [PNG](https://raw.githubusercontent.com/sbanjoe25/tobi-flap/assets/media/photo-flap-alien-logo.png) | `19f6c57344103c5252128e0115c89e837942e21061ae159f1b4a115fce68152a` |
 | Tobi cockpit pilot art | [PNG](https://raw.githubusercontent.com/sbanjoe25/tobi-flap/assets/media/tobi-flap-tobi-cockpit-edge-clean.png) | `1e9e350a808bc284c8135f3572028430ba992d7a8a973dfb244b6cc91865e872` |
 | Liam cockpit pilot art | [PNG](https://raw.githubusercontent.com/sbanjoe25/tobi-flap/assets/media/tobi-flap-liam-cockpit-cutout.png) | `5c97ba26625cab4a003e38f9bc50ce41ee813b4e3708672f03db3a763d1685d5` |
 | Space Arcade soundtrack | [MP3](https://raw.githubusercontent.com/sbanjoe25/tobi-flap/assets/media/tobi-flap-space-arcade-loop.mp3) | `34373a1349579622a52067c67a781f7e8fa29763ca4bd2e7e777d158281adfb0` |

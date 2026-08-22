@@ -100,3 +100,6 @@
 - [x] Configure Vite for the GitHub Pages repository subpath.
 - [x] Validate generated production asset URLs under the Pages base path.
 - [x] Push the corrected Vite configuration to GitHub.
+- [x] Add build-aware media URLs for GitHub Pages.
+- [x] Verify GitHub Pages builds use public logo, pilot, and soundtrack URLs.
+- [x] Push the build-aware media URL update to GitHub.

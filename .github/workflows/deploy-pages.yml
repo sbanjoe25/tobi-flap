@@ -41,6 +41,7 @@ jobs:
       - name: Build production site
         env:
           VITE_BASE_PATH: /tobi-flap/
+          VITE_GITHUB_PAGES: "true"
         run: pnpm build
 
       - name: Prevent Jekyll processing

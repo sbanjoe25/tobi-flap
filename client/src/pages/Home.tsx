@@ -35,20 +35,22 @@ const FLAP_VELOCITY = -325;
 const PIPE_SPEED = 126;
 const PIPE_INTERVAL = 1.7;
 
-const logoImage = "/manus-storage/photo-flap-alien-logo_ea409bed.png";
-const soundtrackUrl = "/manus-storage/tobi-flap-space-arcade-loop_c4d9f30e.mp3";
+const githubPagesAssetRoot = "https://raw.githubusercontent.com/sbanjoe25/tobi-flap/assets/media";
+const mediaUrl = (managedUrl: string, publicFilename: string) => import.meta.env.VITE_GITHUB_PAGES === "true" ? `${githubPagesAssetRoot}/${publicFilename}` : managedUrl;
+const logoImage = mediaUrl("/manus-storage/photo-flap-alien-logo_ea409bed.png", "photo-flap-alien-logo.png");
+const soundtrackUrl = mediaUrl("/manus-storage/tobi-flap-space-arcade-loop_c4d9f30e.mp3", "tobi-flap-space-arcade-loop.mp3");
 
 const CHARACTERS: Array<{ id: CharacterId; name: string; image: string; note: string }> = [
   {
     id: "tobi",
     name: "Tobi",
-    image: "/manus-storage/tobi-flap-tobi-cockpit-edge-clean_34dda769.png",
+    image: mediaUrl("/manus-storage/tobi-flap-tobi-cockpit-edge-clean_34dda769.png", "tobi-flap-tobi-cockpit-edge-clean.png"),
     note: "Orbit scout",
   },
   {
     id: "liam",
     name: "Liam",
-    image: "/manus-storage/tobi-flap-liam-cockpit-cutout_8fd6ac54.png",
+    image: mediaUrl("/manus-storage/tobi-flap-liam-cockpit-cutout_8fd6ac54.png", "tobi-flap-liam-cockpit-cutout.png"),
     note: "Comet copilot",
   },
 ];
