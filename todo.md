@@ -85,3 +85,7 @@
 - [x] Add a Makefile covering local install, development, checks, tests, and builds.
 - [x] Run the full validation suite and document local setup.
 - [x] Create a private GitHub repository and push the completed project.
+- [x] Define a paused game state that preserves the active flight position and score.
+- [x] Add an in-flight pause control that opens the audio settings panel.
+- [x] Add a resume control and preserve safe in-flight input behavior.
+- [x] Validate pause, settings, and resume behavior and save a delivery checkpoint.

@@ -3,7 +3,7 @@
  */
 import { Button } from "@/components/ui/button";
 import { canAcceptFlap, clampVolume, doesAsteroidHitPlayer, getAsteroidDifficulty, getSecondsUntilNextThreat, THREAT_TIER_INTERVAL, type Asteroid, type GameStatus } from "@/lib/game";
-import { ArrowUp, LayoutGrid, RotateCcw, SlidersHorizontal, Trophy, Volume2, VolumeX } from "lucide-react";
+import { ArrowUp, LayoutGrid, Pause, Play, RotateCcw, SlidersHorizontal, Trophy, Volume2, VolumeX } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type CharacterId = "tobi" | "liam";
@@ -441,8 +441,28 @@ export default function Home() {
   }, []);
 
   const returnToMenu = useCallback(() => {
+    setIsSettingsOpen(false);
     resetFlight(false);
   }, [resetFlight]);
+
+  const pauseFlight = useCallback(() => {
+    if (statusRef.current !== "playing") return;
+    statusRef.current = "paused";
+    setStatus("paused");
+    setIsSettingsOpen(true);
+    stopHoverAudio();
+    stopBackgroundMusic();
+  }, [stopBackgroundMusic, stopHoverAudio]);
+
+  const resumeFlight = useCallback(() => {
+    if (statusRef.current !== "paused") return;
+    gameRef.current.lastTimestamp = 0;
+    statusRef.current = "playing";
+    setStatus("playing");
+    setIsSettingsOpen(false);
+    startHoverAudio(selectedCharacterId);
+    startBackgroundMusic();
+  }, [selectedCharacterId, startBackgroundMusic, startHoverAudio]);
 
   const toggleMute = useCallback(() => {
     setIsMuted((previous) => {
@@ -608,7 +628,7 @@ export default function Home() {
             className={`game-stage game-stage--${status} game-stage--${gameMode}`}
             onPointerDown={() => flap()}
             role="application"
-            aria-label={status === "playing" ? `Tobi Flap game in flight. ${selectedCharacter.name} is selected. Press Space, Arrow Up, or tap to flap.` : `Tobi Flap game. ${selectedCharacter.name} is selected. Choose a pilot and activate the launch button to begin.`}
+            aria-label={status === "playing" ? `Tobi Flap game in flight. ${selectedCharacter.name} is selected. Press Space, Arrow Up, or tap to flap.` : status === "paused" ? `Tobi Flap flight paused. ${selectedCharacter.name} is selected. Adjust settings or activate Resume Flight to continue.` : `Tobi Flap game. ${selectedCharacter.name} is selected. Choose a pilot and activate the launch button to begin.`}
           >
             <div className="starfield starfield--far" aria-hidden="true" />
             <div className="starfield starfield--near" aria-hidden="true" />
@@ -654,6 +674,18 @@ export default function Home() {
             >
               <SlidersHorizontal size={15} />
             </button>
+            {status === "playing" && (
+              <button
+                type="button"
+                className="pause-toggle"
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={pauseFlight}
+                aria-label="Pause flight and open settings"
+                title="Pause flight"
+              >
+                <Pause size={15} fill="currentColor" />
+              </button>
+            )}
             {isSettingsOpen && (
               <section className="audio-settings" role="dialog" aria-label="Audio settings" onPointerDown={(event) => event.stopPropagation()}>
                 <div className="audio-settings__heading"><span>AUDIO</span><button type="button" onClick={() => setIsSettingsOpen(false)} aria-label="Close audio settings">×</button></div>
@@ -669,7 +701,7 @@ export default function Home() {
               </section>
             )}
 
-            {status === "playing" && (
+            {(status === "playing" || status === "paused") && (
               <button
                 type="button"
                 className="return-to-menu"
@@ -754,6 +786,30 @@ export default function Home() {
               </div>
             )}
 
+            {status === "paused" && (
+              <div className="game-overlay game-overlay--pause">
+                <div className="game-overlay__card game-overlay__card--pause">
+                  <p className="overlay-kicker">FLIGHT PAUSED</p>
+                  <h2>Hold position.</h2>
+                  <p>Action is frozen while you adjust the audio settings. Resume when your cockpit mix is ready.</p>
+                  <div className="pause-readout">
+                    <span>FLIGHT <strong>{score}</strong></span>
+                    {gameMode === "asteroid" && <span>THREAT <strong>LV {asteroidDifficulty.level}</strong></span>}
+                  </div>
+                  <div className="landing-actions">
+                    <Button className="launch-button" onPointerDown={(event) => event.stopPropagation()} onClick={resumeFlight}>
+                      <Play size={17} fill="currentColor" />
+                      Resume Flight
+                    </Button>
+                    <Button variant="outline" className="menu-button" onPointerDown={(event) => event.stopPropagation()} onClick={returnToMenu}>
+                      <LayoutGrid size={16} />
+                      Return to Menu
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {status === "gameover" && (
               <div className="game-overlay game-overlay--over">
                 <div className="game-overlay__card game-overlay__card--over">
@@ -784,7 +840,7 @@ export default function Home() {
 
           <footer className="cabinet-footer">
             <span className="cabinet-footer__dot" />
-            <p>{status === "playing" ? <>Tap, click, or press <kbd>SPACE</kbd> to boost.</> : "Use the launch button to take off."}</p>
+            <p>{status === "playing" ? <>Tap, click, or press <kbd>SPACE</kbd> to boost.</> : status === "paused" ? "Flight paused — adjust settings, then resume." : "Use the launch button to take off."}</p>
             <span className="cabinet-footer__dots" aria-hidden="true"><i /><i /><i /></span>
           </footer>
         </div>

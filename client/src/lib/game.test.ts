@@ -51,6 +51,8 @@ describe("Launch and audio setting rules", () => {
     expect(canAcceptFlap("gameover", false)).toBe(false);
     expect(canAcceptFlap("gameover", true)).toBe(true);
     expect(canAcceptFlap("playing", false)).toBe(true);
+    expect(canAcceptFlap("paused", false)).toBe(false);
+    expect(canAcceptFlap("paused", true)).toBe(false);
   });
 
   it("keeps music and effects slider values within their valid range", () => {

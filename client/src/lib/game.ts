@@ -1,7 +1,7 @@
 /**
  * Space Arcade game rules: deterministic, DOM-free helpers shared by flight logic and unit tests.
  */
-export type GameStatus = "ready" | "playing" | "gameover";
+export type GameStatus = "ready" | "playing" | "paused" | "gameover";
 
 export type Asteroid = {
   id: number;
