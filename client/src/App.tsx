@@ -1,4 +1,4 @@
-/** Orchard Arcade visual system: tactile storybook arcade cabinet, warm daylight, and generous contrast. */
+/** Space Arcade visual system: a dark cosmic arcade cabinet with vivid cockpit accents and generous contrast. */
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
