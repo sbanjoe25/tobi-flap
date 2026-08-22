@@ -106,3 +106,6 @@
 - [x] Inspect the failing GitHub Pages Actions run and identify the pnpm-version conflict.
 - [x] Apply and push the GitHub Actions remediation.
 - [ ] Confirm a replacement workflow run completes successfully.
+- [x] Inspect the active GitHub Pages URL and repository-path configuration.
+- [x] Correct the deployment path so the game is served beneath /tobi-flap/.
+- [ ] Verify the repository-path deployment and save a delivery checkpoint.
