@@ -114,3 +114,5 @@
 - [x] Define the preloaded game-media set and progress behavior.
 - [x] Add a Space Arcade loading screen with accessible progress feedback.
 - [x] Validate loading behavior for managed preview and GitHub Pages builds.
+- [x] Remove “photo-powered” terminology from player-facing descriptions.
+- [x] Validate the updated copy and publish the refinement.

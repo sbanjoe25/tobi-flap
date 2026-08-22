@@ -945,7 +945,7 @@ export default function Home() {
           <div className="flight-notes__content">
             <div className="flight-notes__label"><span className="flight-notes__badge">SPACE ARCADE</span><span className="flight-notes__brand-stamp" aria-hidden="true"><i /><i /><i /></span></div>
             <h2>One tap.<br />One stellar launch.</h2>
-            <p>Guide your photo-powered cockpit through cosmic gates. Every clear pass powers up your flight score.</p>
+            <p>Guide your cockpit through cosmic gates. Every clear pass powers up your flight score.</p>
 
             <div className="how-to-play">
               <div className="how-to-play__step">
