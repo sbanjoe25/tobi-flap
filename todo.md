@@ -103,3 +103,6 @@
 - [x] Add build-aware media URLs for GitHub Pages.
 - [x] Verify GitHub Pages builds use public logo, pilot, and soundtrack URLs.
 - [x] Push the build-aware media URL update to GitHub.
+- [x] Inspect the failing GitHub Pages Actions run and identify the pnpm-version conflict.
+- [x] Apply and push the GitHub Actions remediation.
+- [ ] Confirm a replacement workflow run completes successfully.
