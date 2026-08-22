@@ -89,3 +89,7 @@
 - [x] Add an in-flight pause control that opens the audio settings panel.
 - [x] Add a resume control and preserve safe in-flight input behavior.
 - [x] Validate pause, settings, and resume behavior and save a delivery checkpoint.
+- [x] Verify the original pilot artwork, soundtrack assets, and GitLab repository access.
+- [ ] Publish the pilot artwork and soundtrack as public GitHub repository release assets.
+- [x] Preserve deployment-safe managed asset references while documenting public asset access.
+- [ ] Validate the project build, release assets, and public repository access.

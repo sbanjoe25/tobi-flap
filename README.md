@@ -24,3 +24,5 @@ The unit suite covers the deterministic game rules that drive active play: the 3
 ## Notes on Assets
 
 Pilot art and soundtrack assets are referenced through managed `/manus-storage/` URLs so the hosted project stays lightweight. The included application source and local commands remain fully available in this repository.
+
+The original pilot artwork and soundtrack can be downloaded from the public GitHub release documented in [ASSETS.md](./ASSETS.md). The application continues to use its managed URLs so that deployment remains reliable.
