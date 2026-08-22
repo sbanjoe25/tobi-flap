@@ -93,3 +93,7 @@
 - [x] Publish the pilot artwork and soundtrack on the public GitHub asset branch.
 - [x] Preserve deployment-safe managed asset references while documenting public asset access.
 - [x] Validate the project build, public asset branch, and repository access.
+- [x] Sync the preview with the latest shared-project version.
+- [x] Add a complete GitHub Pages deployment workflow.
+- [x] Validate the workflow’s build and artifact paths.
+- [x] Push the Pages workflow to the public GitHub repository.
