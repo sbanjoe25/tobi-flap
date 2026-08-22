@@ -97,3 +97,6 @@
 - [x] Add a complete GitHub Pages deployment workflow.
 - [x] Validate the workflow’s build and artifact paths.
 - [x] Push the Pages workflow to the public GitHub repository.
+- [x] Configure Vite for the GitHub Pages repository subpath.
+- [x] Validate generated production asset URLs under the Pages base path.
+- [ ] Push the corrected Vite configuration to GitHub.
